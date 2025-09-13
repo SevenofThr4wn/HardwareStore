@@ -1,6 +1,8 @@
 ﻿using HardwareStore.Data.Helper;
 using HardwareStore.Data.Identity;
 using HardwareStore.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -54,7 +56,11 @@ namespace HardwareStore.WebClient.Controllers
             return RedirectToAction("Login");
         }
 
-        [HttpGet]
-        public IActionResult Login() => View();
+        [HttpGet("login")]
+        public IActionResult Login(string? returnUrl = "/")
+        {
+            return Challenge(new AuthenticationProperties { RedirectUri = returnUrl ?? "/" },
+                OpenIdConnectDefaults.AuthenticationScheme);
+        }
     }
 }

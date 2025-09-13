@@ -13,10 +13,12 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HardwareStore.Extensions\HardwareStore.Extensions.csproj" />
     <ProjectReference Include="..\HardwareStore.Services\HardwareStore.Services.csproj" />
   </ItemGroup>
 

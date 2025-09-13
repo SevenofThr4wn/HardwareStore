@@ -1,5 +1,6 @@
 ﻿using Keycloak.Net;
 using Keycloak.Net.Models.Users;
+using Microsoft.Extensions.Options;
 
 namespace HardwareStore.Data.Helper
 {
@@ -8,10 +9,11 @@ namespace HardwareStore.Data.Helper
         private readonly KeycloakClient _client;
         private readonly string _realm;
 
-        public KeycloakHelper(string serverUrl, string realm, string adminUser, string adminPassword)
+        public KeycloakHelper(IOptions<KeycloakOptions> options)
         {
-            _realm = realm;
-            _client = new KeycloakClient(serverUrl, adminUser, adminPassword);
+            var opts = options.Value;
+            _realm = opts.Realm;
+            _client = new KeycloakClient(opts.ServerUrl, opts.AdminUser, opts.AdminPassword);
         }
 
         public async Task<bool> CreateUserAsync(User kcUser, string password)
