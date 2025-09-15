@@ -59,6 +59,18 @@ namespace HardwareStore.Extensions.Extensions
                 options.ResponseType = oidc["ResponseType"]!;
                 options.CallbackPath = oidc["CallbackPath"];
 
+
+                options.ClaimActions.Clear(); // clear any old mappings
+                options.ClaimActions.MapJsonKey(ClaimTypes.Role, "roles"); // map the Keycloak roles array to ASP.NET roles
+                options.ClaimActions.MapJsonKey("roles", "roles"); // optional, keeps your logging claims if needed
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    NameClaimType = "preferred_username",
+                    RoleClaimType = ClaimTypes.Role,
+                    ValidateIssuer = true
+                };
+
                 // Temporary for development
                 options.RequireHttpsMetadata = false;
 
@@ -81,13 +93,7 @@ namespace HardwareStore.Extensions.Extensions
                 options.Scope.Add("profile");
                 options.Scope.Add("email");
 
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    NameClaimType = "preferred_username",
-                    RoleClaimType = "roles",
-                    ValidateIssuer = true
-                };
-
+               
                 // Configures Event Handling & Logging
                 options.Events = new OpenIdConnectEvents
                 {

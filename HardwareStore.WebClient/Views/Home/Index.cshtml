@@ -11,5 +11,7 @@
     <strong>Debug Info:</strong><br />
     IsAuthenticated: @User.Identity?.IsAuthenticated<br />
     UserName: @User.Identity?.Name<br />
-    Claims Count: @User.Claims.Count()<br />
+    <p>
+        Claims: @User.Claims.Count()
+    <p>Is Admin: @User.IsInRole("Admin")</p>
 </div>

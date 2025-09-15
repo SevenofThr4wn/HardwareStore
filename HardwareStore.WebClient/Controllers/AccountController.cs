@@ -31,6 +31,8 @@ namespace HardwareStore.WebClient.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(string username, string email, string password)
         {
+
+
             // 1. Create local EF user
             var user = new HardwareStore.Core.Models.User
             {
@@ -93,6 +95,5 @@ namespace HardwareStore.WebClient.Controllers
 
             return Redirect(logoutUrl);
         }
-
     }
 }

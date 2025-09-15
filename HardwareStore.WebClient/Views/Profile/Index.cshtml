@@ -4,48 +4,359 @@
     Layout = "_Layout";
 }
 <head>
-<style>
-    body {
-        background-color: #f5f5f7;
-        color: #1d1d1f;
-    }
+    <style>
 
-    .apple-header {
-        background-color: rgba(0, 0, 0, 0.8);
-    }
-
-    .account-card {
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s;
-    }
-
-        .account-card:hover {
-            transform: translateY(-2px);
+        body {
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 16px;
         }
 
-    .nav-pills .nav-link.active {
-        background-color: #0071e3;
-    }
+        .apple-header {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
 
-    .btn-apple {
-        background-color: #0071e3;
-        color: white;
-    }
+        .account-card {
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: white;
+            border: 1px solid #e5e5e7;
+        }
+
+        .account-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #0071e3;
+            font-size: 1.1rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .nav-pills .nav-link {
+            font-size: 1.1rem;
+            padding: 0.75rem 1rem;
+            color: #1d1d1f;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-apple {
+            background-color: #0071e3;
+            color: white;
+            font-size: 1.1rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+        }
 
         .btn-apple:hover {
             background-color: #0062c4;
             color: white;
+            transform: translateY(-1px);
         }
 
-    .security-item {
-        border-left: 3px solid #0071e3;
-    }
+        .security-item {
+            border-left: 4px solid #0071e3;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f8f9fa;
+        }
 
-    .device-card {
-        border-left: 4px solid #0071e3;
-    }
-</style>
+        .device-card {
+            border-left: 5px solid #0071e3;
+            border-radius: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .device-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .badge-manager {
+            background: linear-gradient(135deg, #9933ff, #9933ff, #9933ff);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            box-shadow: 0 6px 12px rgba(139, 92, 246, 0.25);
+            display: inline-block;
+            line-height: 1.2;
+            white-space: nowrap;
+            /* Force vertical offset */
+            position: relative;
+            top: 15px; /* adjust up/down until it looks right */
+        }
+        
+        .badge-admin {
+            background: linear-gradient(135deg, #cc0000, #cc0000, #cc0000);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            box-shadow: 0 6px 12px rgba(139, 92, 246, 0.25);
+            display: inline;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .badge-staff {
+            background: linear-gradient(135deg, #3366ff, #3366ff, #3366ff);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            box-shadow: 0 6px 12px rgba(139, 92, 246, 0.25);
+        }
+
+
+        .badges-inline {
+            margin: 0.9rem 0;
+            line-height: 1;
+        }
+
+            .badges-inline .badge-manager+ .badge-admin,
+            .badges-inline .badge-admin+ .badge-manager {
+                margin-left: 0.5rem;
+            }
+
+            /* Ensure proper vertical alignment */
+            .badges-inline .badge-manager,
+            .badges-inline .badge-admin {
+                vertical-align: baseline; /* Align to text baseline */
+            }
+
+        .admin-badge-container {
+            margin-top: 1.0rem;
+            margin-bottom: 2rem;
+        }
+
+        .badge-icon {
+            margin-right: 0.3rem !important;
+            font-size: 0.7rem;
+            vertical-align: -0.1em;
+        }
+
+        /* 1440p+ Optimized Styles */
+        .container {
+            max-width: 1600px;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        main.container {
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        h5 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        h6 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .table {
+            font-size: 1.05rem;
+        }
+
+        .table th {
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 1rem 0.75rem;
+        }
+
+            .table td {
+                padding: 0.875rem 0.75rem;
+            }
+
+        .btn {
+            font-size: 1.05rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: 10px;
+        }
+
+        .btn-sm {
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+        }
+
+        /* Larger icons for high-resolution displays */
+        .bi {
+            font-size: 1.2em;
+        }
+
+        .fs-1 {
+            font-size: 3.5rem !important;
+        }
+
+        .fs-3 {
+            font-size: 2rem !important;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                max-width: 100%;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+
+            .card-title {
+                font-size: 1.3rem;
+            }
+
+            .fs-1 {
+                font-size: 2.5rem !important;
+            }
+        }
+
+        /* 1080p Optimization */
+        @@media (min-width: 1920px) and (max-width: 2560px) {
+            .container {
+                max-width: 1800px;
+            }
+
+            body {
+                font-size: 17px;
+            }
+
+            .card-title {
+                font-size: 1.6rem;
+            }
+        }
+
+        /* 1440p+ Specific (2560px and above) */
+        @@media (min-width: 2560px) {
+            .container {
+                max-width: 2000px;
+            }
+
+            body {
+                font-size: 18px;
+            }
+
+            .card-title {
+                font-size: 1.75rem;
+            }
+
+            h5 {
+                font-size: 1.5rem;
+            }
+
+            h6 {
+                font-size: 1.25rem;
+            }
+
+            .card-body {
+                padding: 2.5rem;
+            }
+
+            .table {
+                font-size: 1.15rem;
+            }
+
+            .btn {
+                font-size: 1.1rem;
+                padding: 0.75rem 1.5rem;
+            }
+            /* Even larger icons for ultra-high resolution */
+            .bi {
+                font-size: 1.3em;
+            }
+
+            .fs-1 {
+                font-size: 4rem !important;
+            }
+
+            .fs-3 {
+                font-size: 2.5rem !important;
+            }
+        }
+
+        /* 4K and Ultra-wide displays */
+        @@media (min-width: 3840px) {
+            .container {
+                max-width: 2400px;
+            }
+
+            body {
+                font-size: 20px;
+            }
+        }
+
+        /* High DPI/Retina displays */
+        @@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .account-card {
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            }
+
+            .badge-manager {
+                box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
+            }
+        }
+
+        /* Accessibility improvements */
+        @@media (prefers-reduced-motion: reduce) {
+            .account-card, .device-card, .btn-apple {
+                transition: none;
+                transform: none !important;
+            }
+        }
+
+        /* Improved spacing for large screens */
+        .row {
+            margin-left: -0.75rem;
+            margin-right: -0.75rem;
+        }
+
+        .col-md-3, .col-md-9 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 2rem !important;
+        }
+
+        .my-4 {
+            margin-top: 2rem !important;
+            margin-bottom: 2rem !important;
+        }
+
+    </style>
 </head>
 <body>
     <!-- Main Content -->
@@ -58,6 +369,32 @@
                         <i class="bi bi-person-circle fs-1 text-secondary mb-2"></i>
                         <h5 class="card-title">@Model.DisplayName</h5>
                         <p class="text-muted">@Model.Email</p>
+
+                        <!-- Admin badge and Staff badge if user is admin -->
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <div class="badges-inline">
+                                <span class="badge-staff">Staff</span>
+                                <span class="badge-admin"><i class="bi bi-shield-check badge-icon"></i>Administrator</span>
+                            </div>
+                        }
+                        <!-- Admin, staff, and manager badge if user is manager -->
+                        @if (User.IsInRole("Manager"))
+                        {
+                            <div class="badges-inline">
+                                <span class="badge-staff"><i class="bi bi-briefcase badge-icon"></i>Staff</span>
+                                <span class="badge-admin"><i class="bi bi-shield-check badge-icon"></i>Administrator</span>
+                                <span class="badge-manager"><i class="bi bi-gear badge-icon"></i>Manager</span>
+                            </div>                            
+                        }
+
+                        <!-- Staff badge user is staff -->
+                        @if (User.IsInRole("Staff"))
+                        {
+                            <div class="badges-inline">
+                                <span class="badge-staff">Staff</span>
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -72,7 +409,7 @@
                         <a class="nav-link" href="#"><i class="bi bi-credit-card me-2"></i> Payment & Shipping</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="bi bi-device-iphone me-2"></i> Devices</a>
+                        <a class="nav-link" href="#"><i class="bi bi-phone me-2"></i> Devices</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#"><i class="bi bi-cloud me-2"></i> iCloud</a>
@@ -80,8 +417,53 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#"><i class="bi bi-people me-2"></i> Family Sharing</a>
                     </li>
+
+                    <!-- Admin Menu Button (Only for Admins & Manager) -->
+                    @if (User.IsInRole("Admin") && User.IsInRole("Manager"))
+                    {
+                        <li class="nav-item mt-3">
+                            <div class="dropdown">
+                                <button class="btn admin-btn w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-shield-lock me-2"></i> Admin Panel
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    <li>
+                                        <a class="dropdown-item" href="/Admin/Dashboard">
+                                            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="/Admin/Users">
+                                            <i class="bi bi-people me-2"></i> Manage Users
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="/Admin/Products">
+                                            <i class="bi bi-box me-2"></i> Manage Products
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="/Admin/Orders">
+                                            <i class="bi bi-cart me-2"></i> Manage Orders
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="/Admin/Settings">
+                                            <i class="bi bi-gear me-2"></i> Admin Settings
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    }
+
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="bi bi-box-arrow-right me-2"></i> Sign Out</a>
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="mt-3">
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </div>
@@ -181,6 +563,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <!--Placeholder Items-->
                                     <tr>
                                         <td><i class="bi bi-music-note-beamed me-2"></i> Apple Music</td>
                                         <td>Individual</td>
