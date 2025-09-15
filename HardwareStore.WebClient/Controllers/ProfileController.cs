@@ -29,6 +29,8 @@ namespace HardwareStore.WebClient.Controllers
         [HttpGet("/SecuritySettings")]
         public IActionResult Security()
         {
+
+
             return View();
         }
 
@@ -52,6 +54,14 @@ namespace HardwareStore.WebClient.Controllers
 
         [HttpGet("/Orders")]
         public IActionResult Orders()
+        {
+            return View();
+        }
+
+
+
+        [HttpPost]
+        public IActionResult ChangePassword()
         {
             return View();
         }

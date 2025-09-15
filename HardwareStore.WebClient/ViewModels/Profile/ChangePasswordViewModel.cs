@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HardwareStore.WebClient.ViewModels
+namespace HardwareStore.WebClient.ViewModels.Profile
 {
     public class ChangePasswordViewModel
     {

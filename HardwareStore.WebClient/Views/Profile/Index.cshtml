@@ -30,6 +30,11 @@
             box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
         }
 
+        .nav-pills .nav-link:hover {
+            background-color: #6699ff;
+            transform: translateX(4px);
+        }
+
         .nav-pills .nav-link.active {
             background-color: #0071e3;
             font-size: 1.1rem;
@@ -117,6 +122,19 @@
             letter-spacing: 0.05em;
             box-shadow: 0 6px 12px rgba(139, 92, 246, 0.25);
         }
+
+        /* Admin button styling */
+        .admin-btn {
+            background: linear-gradient(135deg, #ff2d20, #cc0000);
+            color: white;
+            border: none;
+            margin-top: 1rem;
+        }
+
+            .admin-btn:hover {
+                background: linear-gradient(135deg, #cc0000, #e62a1d);
+                color: white;
+            }
 
 
         .badges-inline {
@@ -419,7 +437,7 @@
                     </li>
 
                     <!-- Admin Menu Button (Only for Admins & Manager) -->
-                    @if (User.IsInRole("Admin") && User.IsInRole("Manager"))
+                    @if (User.IsInRole("Admin"))
                     {
                         <li class="nav-item mt-3">
                             <div class="dropdown">

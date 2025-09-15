@@ -60,9 +60,9 @@ namespace HardwareStore.Extensions.Extensions
                 options.CallbackPath = oidc["CallbackPath"];
 
 
-                options.ClaimActions.Clear(); // clear any old mappings
-                options.ClaimActions.MapJsonKey(ClaimTypes.Role, "roles"); // map the Keycloak roles array to ASP.NET roles
-                options.ClaimActions.MapJsonKey("roles", "roles"); // optional, keeps your logging claims if needed
+                options.ClaimActions.Clear();
+                options.ClaimActions.MapJsonKey(ClaimTypes.Role, "roles"); 
+                options.ClaimActions.MapJsonKey("roles", "roles"); 
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -71,7 +71,6 @@ namespace HardwareStore.Extensions.Extensions
                     ValidateIssuer = true
                 };
 
-                // Temporary for development
                 options.RequireHttpsMetadata = false;
 
                 options.SaveTokens = true;
@@ -93,7 +92,6 @@ namespace HardwareStore.Extensions.Extensions
                 options.Scope.Add("profile");
                 options.Scope.Add("email");
 
-               
                 // Configures Event Handling & Logging
                 options.Events = new OpenIdConnectEvents
                 {
@@ -102,14 +100,12 @@ namespace HardwareStore.Extensions.Extensions
                         Console.WriteLine($"Redirecting to: {context.ProtocolMessage.IssuerAddress}");
                         return Task.CompletedTask;
                     },
-
                     OnTicketReceived = context =>
                     {
                         Console.WriteLine("Authentication ticket received");
                         Console.WriteLine($"IsAuthenticated: {context.Principal?.Identity?.IsAuthenticated}");
                         return Task.CompletedTask;
                     },
-
                     OnTokenValidated = context =>
                     {
                         Console.WriteLine("Token validated - checking principal");
@@ -133,27 +129,23 @@ namespace HardwareStore.Extensions.Extensions
 
                         return Task.CompletedTask;
                     },
-
                     OnUserInformationReceived = context =>
                     {
                         Console.WriteLine("User information received");
                         return Task.CompletedTask;
                     },
-
                     OnAuthenticationFailed = context =>
                     {
                         Console.WriteLine($"Authentication failed: {context.Exception?.Message}");
                         Console.WriteLine($"Exception: {context.Exception}");
                         return Task.CompletedTask;
                     },
-
                     OnRemoteFailure = context =>
                     {
                         Console.WriteLine($"Remote failure: {context.Failure?.Message}");
                         Console.WriteLine($"Error: {context.Failure}");
                         return Task.CompletedTask;
                     },
-
                     OnMessageReceived = context =>
                     {
                         Console.WriteLine($"Message received: {context.ProtocolMessage?.Error}");
