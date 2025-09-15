@@ -13,9 +13,22 @@ namespace HardwareStore.WebClient.Services
             _hubContext = hubContext;
         }
 
-        public async Task PublishAsync(string userId, string message)
+        /// <summary>
+        /// Publish a notification message via SignalR.
+        /// If userId is provided, sends to a specific user; otherwise broadcasts to all.
+        /// </summary>
+        public async Task PublishAsync(string message, string? userId = null)
         {
-            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", message);
+            if (!string.IsNullOrEmpty(userId))
+            {
+                await _hubContext.Clients.User(userId)
+                    .SendAsync("ReceiveNotification", message);
+            }
+            else
+            {
+                await _hubContext.Clients.All
+                    .SendAsync("ReceiveNotification", message);
+            }
         }
     }
 }

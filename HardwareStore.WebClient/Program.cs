@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddRepositories();
 builder.Services.AddServices(builder.Configuration);
 
@@ -21,6 +22,7 @@ builder.Services.ConfigureSQLDatabase(builder.Configuration);
 
 // Authentication
 builder.Services.ConfigureKeycloakAuthentication(builder.Configuration);
+builder.Services.ConfigureCookies();
 
 var app = builder.Build();
 
@@ -33,6 +35,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseCookiePolicy();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

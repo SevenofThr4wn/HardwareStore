@@ -1,8 +1,8 @@
 ﻿using HardwareStore.Data.Helper;
 using HardwareStore.Data.Repositories;
 using HardwareStore.Data.Repositories.Interfaces;
-using HardwareStore.Services.Interfaces;
 using HardwareStore.Services.Implementations;
+using HardwareStore.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

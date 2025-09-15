@@ -2,6 +2,7 @@
 using HardwareStore.Data.Identity;
 using HardwareStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -62,5 +63,36 @@ namespace HardwareStore.WebClient.Controllers
             return Challenge(new AuthenticationProperties { RedirectUri = returnUrl ?? "/" },
                 OpenIdConnectDefaults.AuthenticationScheme);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            var idToken = await HttpContext.GetTokenAsync("id_token");
+            var clientId = _keycloakHelper.GetClientId();
+            var postLogoutRedirect = Url.Action("Index", "Home", null, Request.Scheme) ?? "/";
+
+            string logoutUrl;
+
+            if (!string.IsNullOrEmpty(idToken))
+            {
+                // Preferred way: use id_token_hint
+                logoutUrl = $"{_keycloakHelper.GetKeycloakAuthority()}/protocol/openid-connect/logout?" +
+                            $"id_token_hint={Uri.EscapeDataString(idToken)}&" +
+                            $"post_logout_redirect_uri={Uri.EscapeDataString(postLogoutRedirect)}";
+            }
+            else
+            {
+                // Fallback: use client_id if id_token is missing
+                logoutUrl = $"{_keycloakHelper.GetKeycloakAuthority()}/protocol/openid-connect/logout?" +
+                            $"client_id={Uri.EscapeDataString(clientId)}&" +
+                            $"post_logout_redirect_uri={Uri.EscapeDataString(postLogoutRedirect)}";
+            }
+
+            // Clear local auth cookies
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return Redirect(logoutUrl);
+        }
+
     }
 }

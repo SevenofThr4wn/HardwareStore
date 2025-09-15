@@ -1,0 +1,218 @@
+﻿@model HardwareStore.WebClient.ViewModels.Profile.ProfileOverviewViewModel
+@{
+    ViewData["Title"] = "Account Management";
+    Layout = "_Layout";
+}
+<head>
+<style>
+    body {
+        background-color: #f5f5f7;
+        color: #1d1d1f;
+    }
+
+    .apple-header {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .account-card {
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s;
+    }
+
+        .account-card:hover {
+            transform: translateY(-2px);
+        }
+
+    .nav-pills .nav-link.active {
+        background-color: #0071e3;
+    }
+
+    .btn-apple {
+        background-color: #0071e3;
+        color: white;
+    }
+
+        .btn-apple:hover {
+            background-color: #0062c4;
+            color: white;
+        }
+
+    .security-item {
+        border-left: 3px solid #0071e3;
+    }
+
+    .device-card {
+        border-left: 4px solid #0071e3;
+    }
+</style>
+</head>
+<body>
+    <!-- Main Content -->
+    <main class="container my-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 mb-4">
+                <div class="card account-card mb-3">
+                    <div class="card-body text-center">
+                        <i class="bi bi-person-circle fs-1 text-secondary mb-2"></i>
+                        <h5 class="card-title">@Model.DisplayName</h5>
+                        <p class="text-muted">@Model.Email</p>
+                    </div>
+                </div>
+
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="bi bi-person me-2"></i> Account</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-shield-lock me-2"></i> Security</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-credit-card me-2"></i> Payment & Shipping</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-device-iphone me-2"></i> Devices</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-cloud me-2"></i> iCloud</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-people me-2"></i> Family Sharing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-box-arrow-right me-2"></i> Sign Out</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="col-md-9">
+                <div class="card account-card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Account</h4>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>Personal Information</h5>
+                                <p class="text-muted">@Model.DisplayName</p>
+                                <p class="text-muted">@Model.Email</p>
+                                <button class="btn btn-outline-secondary btn-sm">Edit</button>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Contact Information</h5>
+                                <p class="text-muted">+1 (555) 123-4567</p>
+                                <p class="text-muted">123 Apple Street, Cupertino, CA 95014</p>
+                                <button class="btn btn-outline-secondary btn-sm">Edit</button>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!--Security Pane-->
+                        <h5 class="mb-3">Security</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 security-item">
+                                    <h6><i class="bi bi-shield-lock me-2"></i> Password</h6>
+                                    <p class="text-muted">Last changed 3 months ago</p>
+                                    <button class="btn btn-outline-secondary btn-sm">Change Password</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 security-item">
+                                    <h6><i class="bi bi-key me-2"></i> Two-Factor Authentication</h6>
+                                    <p class="text-muted">Enabled</p>
+                                    <button class="btn btn-outline-secondary btn-sm">Manage</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!--Orders Section-->
+                        <h5 class="mb-3">Orders</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card device-card">
+                                    <div class="card-body">
+                                        <div class="d-flex">
+                                            <!--Placeholder Item | GPU -->
+                                            <i class="bi bi-phone fs-3 me-3"></i>
+                                            <div>
+                                                <h6>NVIDIA RTX 4090</h6>
+                                                <p class="text-muted mb-1">Price: $2000 AUD</p>
+                                                <small class="text-muted">Order Placed: Today</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card device-card">
+                                    <div class="card-body">
+                                        <div class="d-flex">
+                                            <!--Placeholder Item | Laptop -->
+                                            <i class="bi bi-laptop fs-3 me-3"></i>
+                                            <div>
+                                                <h6>MacBook Pro</h6>
+                                                <p class="text-muted mb-1">Price: $500 AUD</p>
+                                                <small class="text-muted">Order Placed: Yesterday</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card account-card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Completed Orders</h4>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Order Name</th>
+                                        <th>Items</th>
+                                        <th>Date Completed</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><i class="bi bi-music-note-beamed me-2"></i> Apple Music</td>
+                                        <td>Individual</td>
+                                        <td>June 15, 2023</td>
+                                        <td><button class="btn btn-outline-secondary btn-sm">Manage</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="bi bi-tv me-2"></i> Apple TV+</td>
+                                        <td>Family</td>
+                                        <td>June 20, 2023</td>
+                                        <td><button class="btn btn-outline-secondary btn-sm">Manage</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="bi bi-cloud me-2"></i> iCloud</td>
+                                        <td>200GB</td>
+                                        <td>June 1, 2023</td>
+                                        <td><button class="btn btn-outline-secondary btn-sm">Manage</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+@section Scripts {
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        feather.replace();
+    </script>
+}

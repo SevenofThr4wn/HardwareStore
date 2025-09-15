@@ -9,7 +9,9 @@ namespace HardwareStore.Services.Implementations
         private readonly INotificationRepository _notificationRepository;
         private readonly INotificationPublisher _publisher;
 
-        public NotificationService(INotificationRepository notificationRepository, INotificationPublisher publisher)
+        public NotificationService(
+            INotificationRepository notificationRepository,
+            INotificationPublisher publisher)
         {
             _notificationRepository = notificationRepository;
             _publisher = publisher;
@@ -30,10 +32,20 @@ namespace HardwareStore.Services.Implementations
 
             await _notificationRepository.AddAsync(notification);
 
-            if (_publisher != null)
+            await _publisher.PublishAsync(message, userId);
+        }
+
+        public async Task SendNotificationAsync(string message)
+        {
+            var notification = new Notification
             {
-                await _publisher.PublishAsync(userId, message);
-            }
+                UserId = null,
+                Message = message
+            };
+
+            await _notificationRepository.AddAsync(notification);
+
+            await _publisher.PublishAsync(message, null);
         }
     }
 }

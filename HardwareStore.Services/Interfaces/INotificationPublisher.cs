@@ -2,6 +2,6 @@
 {
     public interface INotificationPublisher
     {
-        Task PublishAsync(string userId, string message);
+        Task PublishAsync(string message, string? userId);
     }
 }
