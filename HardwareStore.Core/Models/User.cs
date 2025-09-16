@@ -17,6 +17,6 @@ namespace HardwareStore.Core.Models
         [Column("email_confirmed")]
         public bool EmailConfirmed { get; set; }
 
-        public ICollection<Order> Orders { get; set; }
+        public ICollection<Order> Orders { get; set; } = new List<Order>;
     }
 }

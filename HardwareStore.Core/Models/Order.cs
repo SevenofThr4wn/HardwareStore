@@ -19,6 +19,6 @@ namespace HardwareStore.Core.Models
         [Column("status")]
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
-        public ICollection<OrderItem> OrderItems { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }
