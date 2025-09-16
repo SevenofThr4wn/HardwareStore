@@ -5,7 +5,7 @@
 }
 <head>
     <style>
-
+        /* Base styles */
         body {
             background-color: #f5f5f7;
             color: #1d1d1f;
@@ -14,33 +14,32 @@
         }
 
         .apple-header {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0,0,0,0.8);
         }
 
-        .account-card {
+        /* Cards */
+        .account-card, .device-card {
             border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            background: white;
+            background: #fff;
             border: 1px solid #e5e5e7;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .account-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+            .account-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 16px 32px rgba(0,0,0,0.12);
+            }
+
+        .device-card {
+            border-left: 5px solid #0071e3;
         }
 
-        .nav-pills .nav-link:hover {
-            background-color: #6699ff;
-            transform: translateX(4px);
-        }
+            .device-card:hover {
+                transform: translateY(-2px);
+            }
 
-        .nav-pills .nav-link.active {
-            background-color: #0071e3;
-            font-size: 1.1rem;
-            padding: 0.75rem 1rem;
-        }
-
+        /* Navigation */
         .nav-pills .nav-link {
             font-size: 1.1rem;
             padding: 0.75rem 1rem;
@@ -49,21 +48,35 @@
             margin-bottom: 0.5rem;
         }
 
-        .btn-apple {
-            background-color: #0071e3;
-            color: white;
-            font-size: 1.1rem;
-            padding: 0.75rem 1.5rem;
+            .nav-pills .nav-link:hover {
+                background-color: #6699ff;
+                transform: translateX(4px);
+            }
+
+            .nav-pills .nav-link.active {
+                background-color: #0071e3;
+            }
+
+        /* Buttons */
+        .btn, .btn-apple {
             border-radius: 12px;
             font-weight: 500;
+            transition: transform 0.2s ease;
         }
 
-        .btn-apple:hover {
-            background-color: #0062c4;
-            color: white;
-            transform: translateY(-1px);
+        .btn-apple {
+            background-color: #0071e3;
+            color: #fff;
+            font-size: 1.1rem;
+            padding: 0.75rem 1.5rem;
         }
 
+            .btn-apple:hover {
+                background-color: #0062c4;
+                transform: translateY(-1px);
+            }
+
+        /* Security & badges */
         .security-item {
             border-left: 4px solid #0071e3;
             padding: 1.5rem;
@@ -71,92 +84,48 @@
             background: #f8f9fa;
         }
 
-        .device-card {
-            border-left: 5px solid #0071e3;
-            border-radius: 12px;
-            transition: transform 0.2s ease;
-        }
-
-        .device-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .badge-manager {
-            background: linear-gradient(135deg, #9933ff, #9933ff, #9933ff);
-            color: white;
+        .badge-staff, .badge-admin, .badge-manager {
+            color: #fff;
             padding: 0.5rem 1rem;
             border-radius: 24px;
             font-size: 0.9rem;
             font-weight: 600;
             letter-spacing: 0.05em;
-            box-shadow: 0 6px 12px rgba(139, 92, 246, 0.25);
-            display: inline-block;
-            line-height: 1.2;
-            white-space: nowrap;
-            /* Force vertical offset */
-            position: relative;
-            top: 15px; /* adjust up/down until it looks right */
-        }
-        
-        .badge-admin {
-            background: linear-gradient(135deg, #cc0000, #cc0000, #cc0000);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 24px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            box-shadow: 0 6px 12px rgba(139, 92, 246, 0.25);
-            display: inline;
+            box-shadow: 0 6px 12px rgba(139,92,246,0.25);
             line-height: 1.2;
             white-space: nowrap;
         }
 
         .badge-staff {
-            background: linear-gradient(135deg, #3366ff, #3366ff, #3366ff);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 24px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            box-shadow: 0 6px 12px rgba(139, 92, 246, 0.25);
+            background: #3366ff;
         }
 
-        /* Admin button styling */
-        .admin-btn {
-            background: linear-gradient(135deg, #ff2d20, #cc0000);
-            color: white;
-            border: none;
-            margin-top: 1rem;
+        .badge-admin {
+            background: #cc0000;
+            display: inline;
         }
 
-            .admin-btn:hover {
-                background: linear-gradient(135deg, #cc0000, #e62a1d);
-                color: white;
-            }
-
+        .badge-manager {
+            background: #9933ff;
+            display: inline-block;
+            position: relative;
+            top: 15px;
+        }
 
         .badges-inline {
             margin: 0.9rem 0;
             line-height: 1;
         }
 
-            .badges-inline .badge-manager+ .badge-admin,
-            .badges-inline .badge-admin+ .badge-manager {
+            .badges-inline .badge-manager + .badge-admin,
+            .badges-inline .badge-admin + .badge-manager {
                 margin-left: 0.5rem;
             }
 
-            /* Ensure proper vertical alignment */
             .badges-inline .badge-manager,
             .badges-inline .badge-admin {
-                vertical-align: baseline; /* Align to text baseline */
+                vertical-align: baseline;
             }
-
-        .admin-badge-container {
-            margin-top: 1.0rem;
-            margin-bottom: 2rem;
-        }
 
         .badge-icon {
             margin-right: 0.3rem !important;
@@ -164,16 +133,26 @@
             vertical-align: -0.1em;
         }
 
-        /* 1440p+ Optimized Styles */
+        /* Admin button */
+        .admin-btn {
+            background: linear-gradient(135deg,#ff2d20,#cc0000);
+            color: #fff;
+            border: none;
+            margin-top: 1rem;
+        }
+
+            .admin-btn:hover {
+                background: linear-gradient(135deg,#cc0000,#e62a1d);
+            }
+
+        /* Layout */
         .container {
             max-width: 1600px;
-            padding-left: 2rem;
-            padding-right: 2rem;
+            padding: 0 2rem;
         }
 
         main.container {
-            margin-top: 3rem;
-            margin-bottom: 3rem;
+            margin: 3rem 0;
         }
 
         .card-title {
@@ -202,11 +181,11 @@
             font-size: 1.05rem;
         }
 
-        .table th {
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 1rem 0.75rem;
-        }
+            .table th {
+                font-size: 1.1rem;
+                font-weight: 600;
+                padding: 1rem 0.75rem;
+            }
 
             .table td {
                 padding: 0.875rem 0.75rem;
@@ -223,7 +202,6 @@
             padding: 0.5rem 1rem;
         }
 
-        /* Larger icons for high-resolution displays */
         .bi {
             font-size: 1.2em;
         }
@@ -236,133 +214,146 @@
             font-size: 2rem !important;
         }
 
-        /* Responsive Design */
+        /* Responsive */
         @@media (max-width: 768px) {
-            body {
-                font-size: 14px;
-            }
+            body
 
-            .container {
-                padding-left: 1rem;
-                padding-right: 1rem;
-                max-width: 100%;
-            }
-
-            .card-body {
-                padding: 1.5rem;
-            }
-
-            .card-title {
-                font-size: 1.3rem;
-            }
-
-            .fs-1 {
-                font-size: 2.5rem !important;
-            }
+        {
+            font-size: 14px;
         }
 
-        /* 1080p Optimization */
-        @@media (min-width: 1920px) and (max-width: 2560px) {
-            .container {
-                max-width: 1800px;
-            }
-
-            body {
-                font-size: 17px;
-            }
-
-            .card-title {
-                font-size: 1.6rem;
-            }
+        .container {
+            padding: 0 1rem;
+            max-width: 100%;
         }
 
-        /* 1440p+ Specific (2560px and above) */
-        @@media (min-width: 2560px) {
-            .container {
-                max-width: 2000px;
-            }
-
-            body {
-                font-size: 18px;
-            }
-
-            .card-title {
-                font-size: 1.75rem;
-            }
-
-            h5 {
-                font-size: 1.5rem;
-            }
-
-            h6 {
-                font-size: 1.25rem;
-            }
-
-            .card-body {
-                padding: 2.5rem;
-            }
-
-            .table {
-                font-size: 1.15rem;
-            }
-
-            .btn {
-                font-size: 1.1rem;
-                padding: 0.75rem 1.5rem;
-            }
-            /* Even larger icons for ultra-high resolution */
-            .bi {
-                font-size: 1.3em;
-            }
-
-            .fs-1 {
-                font-size: 4rem !important;
-            }
-
-            .fs-3 {
-                font-size: 2.5rem !important;
-            }
+        .card-body {
+            padding: 1.5rem;
         }
 
-        /* 4K and Ultra-wide displays */
-        @@media (min-width: 3840px) {
-            .container {
-                max-width: 2400px;
-            }
-
-            body {
-                font-size: 20px;
-            }
+        .card-title {
+            font-size: 1.3rem;
         }
 
-        /* High DPI/Retina displays */
-        @@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .account-card {
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-            }
-
-            .badge-manager {
-                box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
-            }
+        .fs-1 {
+            font-size: 2.5rem !important;
         }
 
-        /* Accessibility improvements */
+        }
+
+        /* High resolution adjustments */
+        @@media (min-width:1920px) and (max-width:2560px) {
+            .container
+
+        {
+            max-width: 1800px;
+        }
+
+        body {
+            font-size: 17px;
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+        }
+
+        }
+
+        @@media (min-width:2560px) {
+            .container
+
+        {
+            max-width: 2000px;
+        }
+
+        body {
+            font-size: 18px;
+        }
+
+        .card-title {
+            font-size: 1.75rem;
+        }
+
+        h5 {
+            font-size: 1.5rem;
+        }
+
+        h6 {
+            font-size: 1.25rem;
+        }
+
+        .card-body {
+            padding: 2.5rem;
+        }
+
+        .table {
+            font-size: 1.15rem;
+        }
+
+        .btn {
+            font-size: 1.1rem;
+            padding: 0.75rem 1.5rem;
+        }
+
+        .bi {
+            font-size: 1.3em;
+        }
+
+        .fs-1 {
+            font-size: 4rem !important;
+        }
+
+        .fs-3 {
+            font-size: 2.5rem !important;
+        }
+
+        }
+
+        @@media (min-width:3840px) {
+            .container
+
+        {
+            max-width: 2400px;
+        }
+
+        body {
+            font-size: 20px;
+        }
+
+        }
+
+        /* Retina */
+        @@media (-webkit-min-device-pixel-ratio:2), (min-resolution:192dpi) {
+            .account-card
+
+        {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .badge-manager {
+            box-shadow: 0 4px 16px rgba(139,92,246,0.2);
+        }
+
+        }
+
+        /* Accessibility */
         @@media (prefers-reduced-motion: reduce) {
-            .account-card, .device-card, .btn-apple {
-                transition: none;
-                transform: none !important;
-            }
+            .account-card, .device-card, .btn-apple
+
+        {
+            transition: none;
+            transform: none !important;
         }
 
-        /* Improved spacing for large screens */
+        }
+
+        /* Spacing */
         .row {
-            margin-left: -0.75rem;
-            margin-right: -0.75rem;
+            margin: 0 -0.75rem;
         }
 
         .col-md-3, .col-md-9 {
-            padding-left: 0.75rem;
-            padding-right: 0.75rem;
+            padding: 0 0.75rem;
         }
 
         .mb-4 {
@@ -370,11 +361,10 @@
         }
 
         .my-4 {
-            margin-top: 2rem !important;
-            margin-bottom: 2rem !important;
+            margin: 2rem 0 !important;
         }
-
     </style>
+
 </head>
 <body>
     <!-- Main Content -->
@@ -392,7 +382,7 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <div class="badges-inline">
-                                <span class="badge-staff">Staff</span>
+                                <span class="badge-staff"><i class="bi bi-briefcase badge-icon"></i>Staff</span>
                                 <span class="badge-admin"><i class="bi bi-shield-check badge-icon"></i>Administrator</span>
                             </div>
                         }
@@ -409,68 +399,38 @@
                         <!-- Staff badge user is staff -->
                         @if (User.IsInRole("Staff"))
                         {
-                            <div class="badges-inline">
-                                <span class="badge-staff">Staff</span>
-                            </div>
+                            <div class="badges-inline"><span class="badge-staff"><i class="bi bi-briefcase badge-icon"></i>Staff</span></div>
                         }
                     </div>
                 </div>
 
                 <ul class="nav nav-pills flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#"><i class="bi bi-person me-2"></i> Account</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="bi bi-shield-lock me-2"></i> Security</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="bi bi-credit-card me-2"></i> Payment & Shipping</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="bi bi-phone me-2"></i> Devices</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="bi bi-cloud me-2"></i> iCloud</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="bi bi-people me-2"></i> Family Sharing</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link active" href="#"><i class="bi bi-person me-2"></i> Account</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-shield-lock me-2"></i> Security</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-credit-card me-2"></i> Payment & Shipping</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-phone me-2"></i> Devices</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-cloud me-2"></i> iCloud</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-people me-2"></i> Family Sharing</a></li>
 
                     <!-- Admin Menu Button (Only for Admins & Manager) -->
-                    @if (User.IsInRole("Admin"))
+                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                     {
                         <li class="nav-item mt-3">
-                            <div class="dropdown">
-                                <button class="btn admin-btn w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="dropdown w-100">
+                                <button class="btn admin-btn w-100 dropdown-toggle" type="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-shield-lock me-2"></i> Admin Panel
                                 </button>
-                                <ul class="dropdown-menu w-100">
-                                    <li>
-                                        <a class="dropdown-item" href="/Admin/Dashboard">
-                                            <i class="bi bi-speedometer2 me-2"></i> Dashboard
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="/Admin/Users">
-                                            <i class="bi bi-people me-2"></i> Manage Users
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="/Admin/Products">
-                                            <i class="bi bi-box me-2"></i> Manage Products
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="/Admin/Orders">
-                                            <i class="bi bi-cart me-2"></i> Manage Orders
-                                        </a>
-                                    </li>
+                                <ul class="dropdown-menu w-100" aria-labelledby="adminDropdown">
+                                    <li><a class="dropdown-item" href="/Admin/Dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="/Admin/Users"><i class="bi bi-people me-2"></i> Manage Users</a></li>
+                                    <li><a class="dropdown-item" href="/Admin/Products"><i class="bi bi-box me-2"></i> Manage Products</a></li>
+                                    <li><a class="dropdown-item" href="/Admin/Orders"><i class="bi bi-cart me-2"></i> Manage Orders</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" href="/Admin/Settings">
-                                            <i class="bi bi-gear me-2"></i> Admin Settings
-                                        </a>
-                                    </li>
+                                    <li><a class="dropdown-item" href="/Admin/Settings"><i class="bi bi-gear me-2"></i> Admin Settings</a></li>
+                                    @if (User.IsInRole("Manager"))
+                                    {
+                                        <li><a class="dropdown-item" href="/Manager/Settings"><i class="bi bi-gear me-2"></i> Manager Settings</a></li>
+                                    }
                                 </ul>
                             </div>
                         </li>
@@ -479,7 +439,7 @@
                     <li class="nav-item">
                         <form asp-controller="Account" asp-action="Logout" method="post" class="mt-3">
                             <button type="submit" class="btn btn-outline-danger w-100">
-                                <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+                                <i class="bi bi-box-arrow-right me-2"></i>Sign Out
                             </button>
                         </form>
                     </li>
@@ -598,7 +558,11 @@
                                         <td><i class="bi bi-cloud me-2"></i> iCloud</td>
                                         <td>200GB</td>
                                         <td>June 1, 2023</td>
-                                        <td><button class="btn btn-outline-secondary btn-sm">Manage</button></td>
+                                        <td>
+                                            <a class="btn btn-outline-secondary btn-sm" href="/Order/ManageOrder">
+                                                Manage
+                                            </a>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -608,7 +572,6 @@
             </div>
         </div>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 @section Scripts {

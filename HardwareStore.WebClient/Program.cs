@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddRepositories();
+builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 
 // Notification Publisher
@@ -22,7 +22,6 @@ builder.Services.ConfigureSQLDatabase(builder.Configuration);
 
 // Authentication
 builder.Services.ConfigureKeycloakAuthentication(builder.Configuration);
-builder.Services.ConfigureCookies();
 
 var app = builder.Build();
 
@@ -46,6 +45,5 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 app.MapHub<NotifHub>("/notifications");
-
 
 app.Run();

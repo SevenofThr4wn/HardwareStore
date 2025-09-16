@@ -4,14 +4,13 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>This page will be updated with more content.</p>
 </div>
+<ul>
+    <li>Remove all hardcoded user-specific values</li>
+    <li>Read all data from SQL Database</li>
+    <li>Implement Account operations(Account Management, Login/Logout, & Registration) through client instead of Keycloak Admin Console</li>
+    <li>Remove redundant backend components</li>
+    <li>Fix roles entry in Database</li>
+</ul>
 
-<div style="background: #f0f0f0; padding: 10px; margin: 10px;">
-    <strong>Debug Info:</strong><br />
-    IsAuthenticated: @User.Identity?.IsAuthenticated<br />
-    UserName: @User.Identity?.Name<br />
-    <p>
-        Claims: @User.Claims.Count()
-    <p>Is Admin: @User.IsInRole("Admin")</p>
-</div>

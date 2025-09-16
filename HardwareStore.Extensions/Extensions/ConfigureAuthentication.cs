@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace HardwareStore.Extensions.Extensions
 {
@@ -14,144 +16,122 @@ namespace HardwareStore.Extensions.Extensions
     {
         public static IServiceCollection ConfigureKeycloakAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
+            var authority = configuration["Keycloak:Authority"];
+            var clientId = configuration["Keycloak:ClientId"];
+
+            if (string.IsNullOrEmpty(authority))
+                throw new InvalidOperationException("Keycloak:Authority must be configured.");
+
+            if (!authority.EndsWith("/")) authority += "/";
+
+            var wellKnownUrl = new Uri(new Uri(authority), ".well-known/openid-configuration").AbsoluteUri;
+
+            var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                wellKnownUrl,
+                new OpenIdConnectConfigurationRetriever(),
+                new HttpDocumentRetriever { RequireHttps = false }
+            );
+
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
             .AddCookie(options =>
             {
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.SameSite = SameSiteMode.None;
                 options.LoginPath = "/Account/Login";
                 options.AccessDeniedPath = "/Account/AccessDenied";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
                 options.SlidingExpiration = true;
-
-                options.Events = new CookieAuthenticationEvents
-                {
-                    OnSigningIn = context =>
-                    {
-                        Console.WriteLine("Cookie signing in process started");
-                        return Task.CompletedTask;
-                    },
-                    OnSignedIn = context =>
-                    {
-                        Console.WriteLine("Cookie signed in successfully");
-                        Console.WriteLine($"User authenticated: {context.Principal?.Identity?.IsAuthenticated}");
-                        return Task.CompletedTask;
-                    },
-                    OnValidatePrincipal = context =>
-                    {
-                        Console.WriteLine("Validating cookie principal");
-                        return Task.CompletedTask;
-                    }
-                };
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
             })
-            .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
+            .AddJwtBearer(options =>
             {
-                var oidc = configuration.GetSection("Keycloak");
-
-                options.Authority = oidc["Authority"];
-                options.ClientId = oidc["ClientId"];
-                options.ResponseType = oidc["ResponseType"]!;
-                options.CallbackPath = oidc["CallbackPath"];
-
-
-                options.ClaimActions.Clear();
-                options.ClaimActions.MapJsonKey(ClaimTypes.Role, "roles"); 
-                options.ClaimActions.MapJsonKey("roles", "roles"); 
+                options.Authority = authority;
+                options.RequireHttpsMetadata = false;
+                options.ConfigurationManager = configurationManager;
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
+                    ValidateIssuer = true,
+                    ValidIssuer = authority.TrimEnd('/'),
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
                     NameClaimType = "preferred_username",
                     RoleClaimType = ClaimTypes.Role,
-                    ValidateIssuer = true
-                };
-
-                options.RequireHttpsMetadata = false;
-
-                options.SaveTokens = true;
-                options.GetClaimsFromUserInfoEndpoint = true;
-
-                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-
-                // Explicitly set the sign-out paths
-                options.SignedOutCallbackPath = "/signout-callback-oidc";
-                options.RemoteSignOutPath = "/signout-oidc";
-
-                // SameSite settings
-                options.CorrelationCookie.SameSite = SameSiteMode.None;
-                options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-
-                // Scopes
-                options.Scope.Clear();
-                options.Scope.Add("openid");
-                options.Scope.Add("profile");
-                options.Scope.Add("email");
-
-                // Configures Event Handling & Logging
-                options.Events = new OpenIdConnectEvents
-                {
-                    OnRedirectToIdentityProvider = context =>
+                    AudienceValidator = (IEnumerable<string> auds, SecurityToken securityToken, TokenValidationParameters tvp) =>
                     {
-                        Console.WriteLine($"Redirecting to: {context.ProtocolMessage.IssuerAddress}");
-                        return Task.CompletedTask;
-                    },
-                    OnTicketReceived = context =>
-                    {
-                        Console.WriteLine("Authentication ticket received");
-                        Console.WriteLine($"IsAuthenticated: {context.Principal?.Identity?.IsAuthenticated}");
-                        return Task.CompletedTask;
-                    },
-                    OnTokenValidated = context =>
-                    {
-                        Console.WriteLine("Token validated - checking principal");
-                        Console.WriteLine($"Principal name: {context.Principal?.Identity?.Name}");
-                        Console.WriteLine($"IsAuthenticated before: {context.Principal?.Identity?.IsAuthenticated}");
+                        var jwt = securityToken as JwtSecurityToken;
+                        if (jwt == null) return false;
 
-                        if (context.Principal?.Identity is ClaimsIdentity identity &&
-                            !identity.IsAuthenticated &&
-                            identity.Claims.Any())
+                        var tokenAudiences = jwt.Audiences?.ToList() ?? new List<string>();
+                        var configuredAudiences = auds?.ToList() ?? new List<string>();
+
+                        if (tokenAudiences.Contains(clientId!)) return true;
+
+                        var azp = jwt.Claims.FirstOrDefault(c => c.Type == "azp")?.Value;
+                        if (!string.IsNullOrEmpty(azp) && azp == clientId) return true;
+
+                        var resourceAccess = jwt.Claims.FirstOrDefault(c => c.Type == "resource_access")?.Value;
+                        if (!string.IsNullOrEmpty(resourceAccess))
                         {
-                            Console.WriteLine("Fixing unauthenticated identity...");
-                            var newIdentity = new ClaimsIdentity(
-                                identity.Claims,
-                                CookieAuthenticationDefaults.AuthenticationScheme,
-                                identity.NameClaimType,
-                                identity.RoleClaimType);
-
-                            context.Principal = new ClaimsPrincipal(newIdentity);
-                            Console.WriteLine($"IsAuthenticated after: {context.Principal.Identity!.IsAuthenticated}");
+                            try
+                            {
+                                using var doc = JsonDocument.Parse(resourceAccess);
+                                if (doc.RootElement.ValueKind == JsonValueKind.Object &&
+                                    doc.RootElement.TryGetProperty(clientId!, out _))
+                                {
+                                    return true;
+                                }
+                            }
+                            catch
+                            {
+                            }
                         }
 
-                        return Task.CompletedTask;
-                    },
-                    OnUserInformationReceived = context =>
+                        if (configuredAudiences.Any() && tokenAudiences.Any(a => configuredAudiences.Contains(a)))
+                            return true;
+
+                        return false;
+                    }
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = context =>
                     {
-                        Console.WriteLine("User information received");
+                        if (context.Principal?.Identity is ClaimsIdentity identity)
+                        {
+                            // Remove existing role claims
+                            var existingRoles = identity.FindAll(ClaimTypes.Role).ToList();
+                            foreach (var r in existingRoles) identity.RemoveClaim(r);
+
+                            // Extract realm roles
+                            AddRolesFromJsonClaim(identity, "realm_access", "roles");
+
+                            // Extract client roles from resource_access
+                            AddRolesFromJsonClaim(identity, "resource_access", null);
+
+                            // Log roles
+                            var rolesFound = identity.FindAll(ClaimTypes.Role).Select(c => c.Value).Distinct();
+                            Console.WriteLine("JWT validated with roles: " + string.Join(", ", rolesFound));
+                        }
                         return Task.CompletedTask;
                     },
                     OnAuthenticationFailed = context =>
                     {
-                        Console.WriteLine($"Authentication failed: {context.Exception?.Message}");
-                        Console.WriteLine($"Exception: {context.Exception}");
-                        return Task.CompletedTask;
-                    },
-                    OnRemoteFailure = context =>
-                    {
-                        Console.WriteLine($"Remote failure: {context.Failure?.Message}");
-                        Console.WriteLine($"Error: {context.Failure}");
-                        return Task.CompletedTask;
-                    },
-                    OnMessageReceived = context =>
-                    {
-                        Console.WriteLine($"Message received: {context.ProtocolMessage?.Error}");
+                        Console.WriteLine("JWT auth failed: " + context.Exception?.Message);
                         return Task.CompletedTask;
                     }
                 };
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAuthenticatedUser", p => p.RequireAuthenticatedUser());
+                options.AddPolicy("RequireAdminRole", p => p.RequireRole("Admin"));
+                options.AddPolicy("RequireStaffRole", p => p.RequireRole("Staff", "Admin", "Manager"));
             });
 
             services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
@@ -159,53 +139,74 @@ namespace HardwareStore.Extensions.Extensions
             return services;
         }
 
-        public static IServiceCollection ConfigureCookies(this IServiceCollection services)
+        private static void AddRolesFromJsonClaim(ClaimsIdentity identity, string claimType, string? rolesProperty)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
-                options.OnAppendCookie = cookieContext =>
-                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
-                options.OnDeleteCookie = cookieContext =>
-                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
-            });
-            return services;
-        }
+            var claim = identity.FindFirst(claimType);
+            if (claim == null) return;
 
-        private static void CheckSameSite(HttpContext httpContext, CookieOptions options)
-        {
-            if (options.SameSite == SameSiteMode.None)
+            try
             {
-                var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+                using var doc = JsonDocument.Parse(claim.Value);
+                var root = doc.RootElement;
+
+                if (root.ValueKind == JsonValueKind.Object && rolesProperty != null && root.TryGetProperty(rolesProperty, out var roles) && roles.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var role in roles.EnumerateArray())
+                    {
+                        var roleName = role.GetString();
+                        if (!string.IsNullOrEmpty(roleName))
+                            identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
+                    }
+                }
+                else if (root.ValueKind == JsonValueKind.Array) // handle arrays like your realm_access
+                {
+                    foreach (var role in root.EnumerateArray())
+                    {
+                        var roleName = role.GetString();
+                        if (!string.IsNullOrEmpty(roleName))
+                            identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
+                    }
+                }
+                else if (rolesProperty == null && root.ValueKind == JsonValueKind.Object) // resource_access
+                {
+                    foreach (var client in root.EnumerateObject())
+                    {
+                        if (client.Value.TryGetProperty("roles", out var clientRoles) && clientRoles.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var role in clientRoles.EnumerateArray())
+                            {
+                                var roleName = role.GetString();
+                                if (!string.IsNullOrEmpty(roleName))
+                                    identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine($"Failed to parse {claimType}: {ex.Message}");
             }
         }
-    }
 
-    public class ClaimsTransformer : IClaimsTransformation
-    {
-        public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+        public class ClaimsTransformer : IClaimsTransformation
         {
-            Console.WriteLine($"ClaimsTransformer - Input IsAuthenticated: {principal?.Identity?.IsAuthenticated}");
-
-            if (principal?.Identity is ClaimsIdentity identity &&
-                !identity.IsAuthenticated &&
-                identity.Claims.Any())
+            public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
             {
-                Console.WriteLine("Transforming unauthenticated identity to authenticated");
-
-                var newIdentity = new ClaimsIdentity(
-                    identity.Claims,
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    identity.NameClaimType,
-                    identity.RoleClaimType);
-
-                var newPrincipal = new ClaimsPrincipal(newIdentity);
-                Console.WriteLine($"ClaimsTransformer - Output IsAuthenticated: {newPrincipal.Identity!.IsAuthenticated}");
-
-                return Task.FromResult(newPrincipal);
+                if (principal?.Identity is ClaimsIdentity identity && identity.IsAuthenticated)
+                {
+                    if (identity.AuthenticationType != CookieAuthenticationDefaults.AuthenticationScheme)
+                    {
+                        var newIdentity = new ClaimsIdentity(
+                            identity.Claims,
+                            CookieAuthenticationDefaults.AuthenticationScheme,
+                            identity.NameClaimType,
+                            identity.RoleClaimType);
+                        return Task.FromResult(new ClaimsPrincipal(newIdentity));
+                    }
+                }
+                return Task.FromResult(principal!);
             }
-
-            return Task.FromResult(principal)!;
         }
     }
 }

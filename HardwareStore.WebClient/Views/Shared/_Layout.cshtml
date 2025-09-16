@@ -35,9 +35,20 @@
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Profile">Profile</a>
+                                <a class="nav-link text-dark" asp-controller="Profile" asp-action="Index">Profile</a>
                             </li>
 
+                            <!--Orders Link-->
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Order" asp-action="Index">Orders</a>
+                            </li>
+
+                            <!--Product Link-->
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Product" asp-action="Index">Product</a>
+                            </li>
+
+                    
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-link nav-link">Logout</button>

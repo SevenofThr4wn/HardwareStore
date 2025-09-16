@@ -13,12 +13,12 @@ namespace HardwareStore.Data.Helper
         private readonly IConfiguration _configuration;
 
 
-        public KeycloakHelper(IOptions<KeycloakOptions> options, IConfiguration configuration)
+        public KeycloakHelper(IOptions<KeycloakOptions> options, IConfiguration configuration, KeycloakClient client)
         {
             _options = options.Value;
             _realm = _options.Realm;
-            _client = new KeycloakClient(_options.ServerUrl, _options.AdminUser, _options.AdminPassword);
             _configuration = configuration;
+            _client = client;
         }
 
         public async Task<bool> CreateUserAsync(User kcUser, string password)
@@ -38,29 +38,9 @@ namespace HardwareStore.Data.Helper
             return authority.TrimEnd('/');
         }
 
-        public string BuildLogoutUrl(string idToken, string redirectUri)
-        {
-            return $"{GetKeycloakAuthority()}/protocol/openid-connect/logout?" +
-                   $"id_token_hint={Uri.EscapeDataString(idToken)}&" +
-                   $"post_logout_redirect_uri={Uri.EscapeDataString(redirectUri)}";
-        }
-
-        public async Task<User> GetUserByUsernameAsync(string username)
-        {
-            var users = await _client.GetUsersAsync(_realm, username: username);
-            return users?.FirstOrDefault()!;
-        }
-
-        // Optional: Helper method to delete user
-        public async Task<bool> DeleteUserAsync(string userId)
-        {
-            return await _client.DeleteUserAsync(_realm, userId);
-        }
-
         public string GetClientId()
         {
-            return _configuration["Keycloak:ClientId"];
+            return _configuration["Keycloak:ClientId"]!;
         }
-
     }
 }

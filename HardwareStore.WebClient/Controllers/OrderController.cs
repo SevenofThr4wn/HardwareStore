@@ -18,7 +18,8 @@ namespace HardwareStore.WebClient.Controllers
             return View(order);
         }
 
-        public async Task<IActionResult> ManageCompletedOrder(int orderId)
+        [HttpGet]
+        public async Task<IActionResult> ManageOrder(int orderId)
         {
             var completedOrder = await _orderService.GetOrderByIDAsync(orderId);
             return View(completedOrder);
