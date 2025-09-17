@@ -11,6 +11,8 @@ namespace HardwareStore.Data.Identity
         public bool IsActive { get; set; }
         public string Role { get; set; } = string.Empty;
 
+        public DateTime DateCreated { get; set; } = DateTime.UtcNow;
+        public DateTime? LastLogin { get; set; } = DateTime.UtcNow;
 
     }
 }

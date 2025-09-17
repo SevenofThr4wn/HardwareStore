@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Manager Settings";
+    Layout = "_Layout";
+}
+<head>
+    <style>
+        .settings-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .settings-header {
+            margin-bottom: 2rem;
+        }
+
+        .settings-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .settings-card {
+            background: #fff;
+            border: 1px solid #e5e5e7;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .settings-section {
+            margin-bottom: 2rem;
+        }
+
+        .settings-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1d1d1f;
+        }
+
+        .form-check {
+            margin-bottom: 1rem;
+        }
+
+        .form-check-input {
+            width: 1.2em;
+            height: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <h1 class="settings-title">Manager Settings</h1>
+            <p class="text-muted">Inventory and team management preferences</p>
+        </div>
+
+        <div class="settings-card">
+            <div class="settings-section">
+                <h3 class="settings-section-title">Inventory Alerts</h3>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" checked>
+                    <label class="form-check-label">Email notifications for low stock</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" checked>
+                    <label class="form-check-label">SMS notifications for critical stock</label>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label class="form-label">Low Stock Threshold</label>
+                    <input type="number" class="form-control" value="10">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3 class="settings-section-title">Order Processing</h3>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" checked>
+                    <label class="form-check-label">Auto-confirm orders</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox">
+                    <label class="form-check-label">Require manager approval for large orders</label>
+                </div>
+            </div>
+
+            <button class="btn btn-primary">
+                <i class="bi bi-check-circle"></i> Save Preferences
+            </button>
+        </div>
+    </div>
+</body>

@@ -20,7 +20,7 @@ namespace HardwareStore.Extensions.Extensions
             var clientId = configuration["Keycloak:ClientId"];
 
             if (string.IsNullOrEmpty(authority))
-                throw new InvalidOperationException("Keycloak:Authority must be configured.");
+                throw new InvalidOperationException("Keycloak:Authority must be configured. Please see appsettings.json for more information");
 
             if (!authority.EndsWith("/")) authority += "/";
 
@@ -44,7 +44,7 @@ namespace HardwareStore.Extensions.Extensions
                 options.LoginPath = "/Account/Login";
                 options.AccessDeniedPath = "/Account/AccessDenied";
                 options.SlidingExpiration = true;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(120);
             })
             .AddJwtBearer(options =>
             {
@@ -52,6 +52,8 @@ namespace HardwareStore.Extensions.Extensions
                 options.RequireHttpsMetadata = false;
                 options.ConfigurationManager = configurationManager;
 
+
+                // Configures JWT Token Validation Parameters
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -97,6 +99,7 @@ namespace HardwareStore.Extensions.Extensions
                     }
                 };
 
+                // Configures Events to handle token validation and role extraction
                 options.Events = new JwtBearerEvents
                 {
                     OnTokenValidated = context =>
@@ -107,21 +110,18 @@ namespace HardwareStore.Extensions.Extensions
                             var existingRoles = identity.FindAll(ClaimTypes.Role).ToList();
                             foreach (var r in existingRoles) identity.RemoveClaim(r);
 
-                            // Extract realm roles
                             AddRolesFromJsonClaim(identity, "realm_access", "roles");
 
-                            // Extract client roles from resource_access
                             AddRolesFromJsonClaim(identity, "resource_access", null);
 
-                            // Log roles
                             var rolesFound = identity.FindAll(ClaimTypes.Role).Select(c => c.Value).Distinct();
-                            Console.WriteLine("JWT validated with roles: " + string.Join(", ", rolesFound));
+                            Console.WriteLine("JWT successfully validated with roles: " + string.Join(", ", rolesFound));
                         }
                         return Task.CompletedTask;
                     },
                     OnAuthenticationFailed = context =>
                     {
-                        Console.WriteLine("JWT auth failed: " + context.Exception?.Message);
+                        Console.WriteLine("JWT authentication failed: " + context.Exception?.Message);
                         return Task.CompletedTask;
                     }
                 };

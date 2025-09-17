@@ -1,0 +1,136 @@
+﻿@{
+    ViewData["Title"] = "Admin Settings";
+    Layout = "_Layout";
+}
+<head>
+    <style>
+        .settings-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .settings-header {
+            margin-bottom: 2rem;
+        }
+
+        .settings-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .settings-card {
+            background: #fff;
+            border: 1px solid #e5e5e7;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .settings-section {
+            margin-bottom: 2rem;
+        }
+
+            .settings-section:last-child {
+                margin-bottom: 0;
+            }
+
+        .settings-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1d1d1f;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1d1d1f;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid #e5e5e7;
+            padding: 1rem;
+        }
+
+        .btn-save {
+            background-color: #0071e3;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-weight: 600;
+        }
+
+            .btn-save:hover {
+                background-color: #0062c4;
+            }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <h1 class="settings-title">Admin Settings</h1>
+            <p class="text-muted">System configuration and preferences</p>
+        </div>
+
+        <div class="settings-card">
+            <div class="settings-section">
+                <h3 class="settings-section-title">System Settings</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Store Name</label>
+                    <input type="text" class="form-control" value="Hardware Store Pro">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Store Email</label>
+                    <input type="email" class="form-control" value="admin@hardwarestore.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Currency</label>
+                    <select class="form-control">
+                        <option selected>USD ($)</option>
+                        <option>EUR (€)</option>
+                        <option>GBP (£)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3 class="settings-section-title">Security Settings</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Session Timeout</label>
+                    <select class="form-control">
+                        <option>15 minutes</option>
+                        <option>30 minutes</option>
+                        <option selected>60 minutes</option>
+                        <option>120 minutes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password Policy</label>
+                    <select class="form-control">
+                        <option>Basic (6+ characters)</option>
+                        <option selected>Standard (8+ characters with numbers)</option>
+                        <option>Strong (12+ characters with numbers and symbols)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn-save">
+                <i class="bi bi-check-circle"></i> Save Settings
+            </button>
+        </div>
+    </div>
+</body>

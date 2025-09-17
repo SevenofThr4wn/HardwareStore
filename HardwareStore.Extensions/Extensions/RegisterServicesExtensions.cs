@@ -27,6 +27,7 @@ namespace HardwareStore.Extensions.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IProductService, ProductService>();
             services.AddScoped<INotificationService, NotificationService>();
 
             // Configure Keycloak options
@@ -42,20 +43,14 @@ namespace HardwareStore.Extensions.Extensions
         /// <summary>
         /// Register repositories for dependency injection
         /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        /// <summary>
-        /// Register repositories for dependency injection
-        /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">An instance of the service collection interface</param>
+        /// <param name="config">An instance of the configuration interface</param>
         /// <returns></returns>
         public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration config)
         {
             // Add HttpClient factory first
             services.AddHttpClient();
 
-            // Register KeycloakClient - THIS IS THE MISSING PIECE
-            // Register KeycloakClient
             services.AddScoped<Keycloak.Net.KeycloakClient>(sp =>
             {
                 var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
@@ -68,7 +63,6 @@ namespace HardwareStore.Extensions.Extensions
                 var clientId = keycloakSection["ClientId"]!;
                 var clientSecret = keycloakSection["ClientSecret"]!;
 
-                // Create the client with just the base URL first
                 var keycloakClient = new Keycloak.Net.KeycloakClient(httpClient.ToString(), serverUrl);
 
                 return keycloakClient;
@@ -79,9 +73,7 @@ namespace HardwareStore.Extensions.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
-            // Remove duplicate registration: services.AddScoped<IProductRepository, ProductRepository>();
 
-            // Add Keycloak Helper - This will now work because KeycloakClient is registered
             services.AddScoped<KeycloakHelper>();
 
             services.AddScoped<KeycloakSync>(sp =>

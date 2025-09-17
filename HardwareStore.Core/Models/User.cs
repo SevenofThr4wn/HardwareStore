@@ -8,6 +8,9 @@ namespace HardwareStore.Core.Models
         [Key, Column("user_id")]
         public string UserId { get; set; } = Guid.NewGuid().ToString();
 
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+
         [Required, MaxLength(100), Column("username")]
         public string Username { get; set; } = string.Empty;
 
@@ -17,6 +20,6 @@ namespace HardwareStore.Core.Models
         [Column("email_confirmed")]
         public bool EmailConfirmed { get; set; }
 
-        public ICollection<Order> Orders { get; set; } = new List<Order>;
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }

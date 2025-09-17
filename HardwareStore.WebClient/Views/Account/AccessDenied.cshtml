@@ -1,0 +1,232 @@
+﻿@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "_Layout";
+}
+<head>
+    <style>
+        /* Fix navigation bar spacing */
+        .navbar {
+            margin-bottom: 0 !important;
+        }
+
+        .main-content {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 80px; /* Height of navbar */
+            margin-top: 0;
+            background: linear-gradient(135deg, #f5f5f7 0%, #ffffff 50%, #f5f5f7 100%);
+        }
+
+        .access-denied-container {
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .access-denied-card {
+            border-radius: 20px;
+            background: #fff;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+            padding: 3rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .access-denied-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 48px rgba(0,0,0,0.16);
+        }
+
+        .access-denied-icon {
+            font-size: 4rem;
+            color: #ff3b30;
+            margin-bottom: 1.5rem;
+        }
+
+        .access-denied-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .access-denied-message {
+            color: #86868b;
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        .btn-home {
+            background-color: #0071e3;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-home:hover {
+            background-color: #0062c4;
+            transform: translateY(-1px);
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(0,113,227,0.2);
+        }
+
+        .support-link {
+            display: block;
+            margin-top: 1.5rem;
+            color: #0071e3;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .support-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive design */
+        @@media (max-width: 768px) {
+            .access-denied-container {
+                padding: 1rem;
+            }
+
+            .access-denied-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .access-denied-title {
+                font-size: 2rem;
+            }
+
+            .access-denied-icon {
+                font-size: 3rem;
+            }
+
+            .access-denied-message {
+                font-size: 1.1rem;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .access-denied-card {
+                padding: 1.5rem;
+            }
+
+            .access-denied-title {
+                font-size: 1.75rem;
+            }
+
+            .access-denied-icon {
+                font-size: 2.5rem;
+            }
+
+            .btn-home {
+                padding: 0.875rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* High resolution adjustments */
+        @@media (min-width: 1920px) {
+            .access-denied-container {
+                max-width: 600px;
+            }
+
+            .access-denied-title {
+                font-size: 3rem;
+            }
+
+            .access-denied-message {
+                font-size: 1.3rem;
+            }
+
+            .access-denied-icon {
+                font-size: 5rem;
+            }
+        }
+
+        /* Animation */
+        @@keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .access-denied-icon {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* Accessibility */
+        @@media (prefers-reduced-motion: reduce) {
+            .access-denied-card, .btn-home {
+                transition: none;
+                transform: none !important;
+            }
+
+            .access-denied-icon {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="access-denied-container">
+            <div class="access-denied-card">
+                <!-- Icon -->
+                <i class="bi bi-shield-slash access-denied-icon"></i>
+
+                <!-- Title -->
+                <h1 class="access-denied-title">Access Denied</h1>
+
+                <!-- Message -->
+                <p class="access-denied-message">
+                    You don't have permission to access this page.
+                    Please contact an administrator if you believe this is an error.
+                </p>
+
+                <!-- Action Button -->
+                <a href="/" class="btn-home">
+                    <i class="bi bi-house-door"></i> Return to Home
+                </a>
+
+                <!-- Support Link -->
+                <a href="/Contact" class="support-link">
+                    <i class="bi bi-envelope"></i> Contact Support
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add subtle hover effect to the card
+            const card = document.querySelector('.access-denied-card');
+            if (card) {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-4px)';
+                    card.style.boxShadow = '0 20px 48px rgba(0,0,0,0.16)';
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                    card.style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)';
+                });
+            }
+        });
+    </script>
+}

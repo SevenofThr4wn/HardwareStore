@@ -15,9 +15,6 @@ namespace HardwareStore.WebClient.Controllers
 
         public IActionResult Index()
         {
-            ViewBag.IsAuthenticated = User.Identity?.IsAuthenticated;
-            ViewBag.UserName = User.Identity?.Name;
-            ViewBag.Claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
             return View();
         }
 

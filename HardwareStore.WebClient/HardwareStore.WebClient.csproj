@@ -29,4 +29,9 @@
     <ProjectReference Include="..\HardwareStore.Services\HardwareStore.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ViewModels\Profile\" />
+    <Folder Include="Views\Products\" />
+  </ItemGroup>
+
 </Project>

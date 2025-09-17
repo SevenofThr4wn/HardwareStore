@@ -1,0 +1,114 @@
+﻿@{
+    ViewData["Title"] = "Manage Orders";
+    Layout = "_Layout";
+}
+<head>
+    <style>
+        .management-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .management-header {
+            margin-bottom: 2rem;
+        }
+
+        .management-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .orders-table {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .badge-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-pending {
+            background-color: #ff9500;
+            color: white;
+        }
+
+        .badge-processing {
+            background-color: #0071e3;
+            color: white;
+        }
+
+        .badge-shipped {
+            background-color: #34c759;
+            color: white;
+        }
+
+        .badge-delivered {
+            background-color: #5856d6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="management-container">
+        <div class="management-header">
+            <h1 class="management-title">Manage Orders</h1>
+            <p class="text-muted">Process and track customer orders</p>
+        </div>
+
+        <div class="orders-table">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#10025</td>
+                        <td>John Smith</td>
+                        <td>Dec 15, 2023</td>
+                        <td>$249.99</td>
+                        <td><span class="badge-status badge-pending">Pending</span></td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm">View</button>
+                            <button class="btn btn-outline-success btn-sm">Process</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#10024</td>
+                        <td>Jane Doe</td>
+                        <td>Dec 15, 2023</td>
+                        <td>$129.99</td>
+                        <td><span class="badge-status badge-processing">Processing</span></td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm">View</button>
+                            <button class="btn btn-outline-success btn-sm">Ship</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#10023</td>
+                        <td>Bob Johnson</td>
+                        <td>Dec 14, 2023</td>
+                        <td>$89.99</td>
+                        <td><span class="badge-status badge-shipped">Shipped</span></td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm">View</button>
+                            <button class="btn btn-outline-success btn-sm">Track</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>

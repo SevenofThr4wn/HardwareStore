@@ -1,4 +1,4 @@
-﻿@model HardwareStore.WebClient.ViewModels.Profile.ProfileOverviewViewModel
+﻿@model HardwareStore.WebClient.ViewModels.Account.ProfileViewModel
 @{
     ViewData["Title"] = "Account Management";
     Layout = "_Layout";
@@ -216,135 +216,117 @@
 
         /* Responsive */
         @@media (max-width: 768px) {
-            body
+            body {
+                font-size: 14px;
+            }
 
-        {
-            font-size: 14px;
-        }
+            .container {
+                padding: 0 1rem;
+                max-width: 100%;
+            }
 
-        .container {
-            padding: 0 1rem;
-            max-width: 100%;
-        }
+            .card-body {
+                padding: 1.5rem;
+            }
 
-        .card-body {
-            padding: 1.5rem;
-        }
+            .card-title {
+                font-size: 1.3rem;
+            }
 
-        .card-title {
-            font-size: 1.3rem;
-        }
-
-        .fs-1 {
-            font-size: 2.5rem !important;
-        }
-
+            .fs-1 {
+                font-size: 2.5rem !important;
+            }
         }
 
         /* High resolution adjustments */
         @@media (min-width:1920px) and (max-width:2560px) {
-            .container
+            .container {
+                max-width: 1800px;
+            }
 
-        {
-            max-width: 1800px;
-        }
+            body {
+                font-size: 17px;
+            }
 
-        body {
-            font-size: 17px;
-        }
-
-        .card-title {
-            font-size: 1.6rem;
-        }
-
+            .card-title {
+                font-size: 1.6rem;
+            }
         }
 
         @@media (min-width:2560px) {
-            .container
+            .container {
+                max-width: 2000px;
+            }
 
-        {
-            max-width: 2000px;
-        }
+            body {
+                font-size: 18px;
+            }
 
-        body {
-            font-size: 18px;
-        }
+            .card-title {
+                font-size: 1.75rem;
+            }
 
-        .card-title {
-            font-size: 1.75rem;
-        }
+            h5 {
+                font-size: 1.5rem;
+            }
 
-        h5 {
-            font-size: 1.5rem;
-        }
+            h6 {
+                font-size: 1.25rem;
+            }
 
-        h6 {
-            font-size: 1.25rem;
-        }
+            .card-body {
+                padding: 2.5rem;
+            }
 
-        .card-body {
-            padding: 2.5rem;
-        }
+            .table {
+                font-size: 1.15rem;
+            }
 
-        .table {
-            font-size: 1.15rem;
-        }
+            .btn {
+                font-size: 1.1rem;
+                padding: 0.75rem 1.5rem;
+            }
 
-        .btn {
-            font-size: 1.1rem;
-            padding: 0.75rem 1.5rem;
-        }
+            .bi {
+                font-size: 1.3em;
+            }
 
-        .bi {
-            font-size: 1.3em;
-        }
+            .fs-1 {
+                font-size: 4rem !important;
+            }
 
-        .fs-1 {
-            font-size: 4rem !important;
-        }
-
-        .fs-3 {
-            font-size: 2.5rem !important;
-        }
-
+            .fs-3 {
+                font-size: 2.5rem !important;
+            }
         }
 
         @@media (min-width:3840px) {
-            .container
+            .container {
+                max-width: 2400px;
+            }
 
-        {
-            max-width: 2400px;
-        }
-
-        body {
-            font-size: 20px;
-        }
-
+            body {
+                font-size: 20px;
+            }
         }
 
         /* Retina */
         @@media (-webkit-min-device-pixel-ratio:2), (min-resolution:192dpi) {
-            .account-card
+            .account-card {
+                box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            }
 
-        {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-        }
-
-        .badge-manager {
-            box-shadow: 0 4px 16px rgba(139,92,246,0.2);
-        }
-
+            .badge-manager {
+                box-shadow: 0 4px 16px rgba(139,92,246,0.2);
+            }
         }
 
         /* Accessibility */
         @@media (prefers-reduced-motion: reduce) {
-            .account-card, .device-card, .btn-apple
-
-        {
-            transition: none;
-            transform: none !important;
-        }
-
+            .account-card, .device-card, .btn-apple {
+                transition: none;
+                transform: none !important;
+            }
         }
 
         /* Spacing */
@@ -393,7 +375,7 @@
                                 <span class="badge-staff"><i class="bi bi-briefcase badge-icon"></i>Staff</span>
                                 <span class="badge-admin"><i class="bi bi-shield-check badge-icon"></i>Administrator</span>
                                 <span class="badge-manager"><i class="bi bi-gear badge-icon"></i>Manager</span>
-                            </div>                            
+                            </div>
                         }
 
                         <!-- Staff badge user is staff -->
@@ -421,15 +403,15 @@
                                     <i class="bi bi-shield-lock me-2"></i> Admin Panel
                                 </button>
                                 <ul class="dropdown-menu w-100" aria-labelledby="adminDropdown">
-                                    <li><a class="dropdown-item" href="/Admin/Dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
-                                    <li><a class="dropdown-item" href="/Admin/Users"><i class="bi bi-people me-2"></i> Manage Users</a></li>
-                                    <li><a class="dropdown-item" href="/Admin/Products"><i class="bi bi-box me-2"></i> Manage Products</a></li>
-                                    <li><a class="dropdown-item" href="/Admin/Orders"><i class="bi bi-cart me-2"></i> Manage Orders</a></li>
+                                    <li><a class="dropdown-item" href="AdminDashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="ManageUsers"><i class="bi bi-people me-2"></i> Manage Users</a></li>
+                                    <li><a class="dropdown-item" href="ManageProducts"><i class="bi bi-box me-2"></i> Manage Products</a></li>
+                                    <li><a class="dropdown-item" href="ManageOrders"><i class="bi bi-cart me-2"></i> Manage Orders</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/Admin/Settings"><i class="bi bi-gear me-2"></i> Admin Settings</a></li>
+                                    <li><a class="dropdown-item" href="AdminSettings"><i class="bi bi-gear me-2"></i> Admin Settings</a></li>
                                     @if (User.IsInRole("Manager"))
                                     {
-                                        <li><a class="dropdown-item" href="/Manager/Settings"><i class="bi bi-gear me-2"></i> Manager Settings</a></li>
+                                        <li><a class="dropdown-item" href="ManagerSettings"><i class="bi bi-gear me-2"></i> Manager Settings</a></li>
                                     }
                                 </ul>
                             </div>
