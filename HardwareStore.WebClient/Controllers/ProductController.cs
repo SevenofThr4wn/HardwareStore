@@ -22,7 +22,6 @@ namespace HardwareStore.WebClient.Controllers
             _productService = productService;
         }
 
-
         // GET: Create Product page
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> CreateProduct()

@@ -1,28 +1,48 @@
-﻿using HardwareStore.Services.Interfaces;
+﻿using HardwareStore.Data.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HardwareStore.WebClient.Controllers
 {
     public class OrderController : Controller
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderRepository _orderRepository;
 
-        public OrderController(IOrderService orderService)
+        public OrderController(IOrderRepository orderRepository)
         {
-            _orderService = orderService;
-        }
-
-        public async Task<IActionResult> TrackOrder(int orderId)
-        {
-            var order = await _orderService.GetOrderByIDAsync(orderId);
-            return View(order);
+            _orderRepository = orderRepository;
         }
 
         [HttpGet]
-        public async Task<IActionResult> ManageOrder(int orderId)
+        public async Task<IActionResult> ManageOrder(int id)
         {
-            var completedOrder = await _orderService.GetOrderByIDAsync(orderId);
-            return View(completedOrder);
+            var selectedOrder = await _orderRepository.GetByIdAsync(id);
+            return View(selectedOrder);
+        }
+
+        // GET: CancelOrder
+        [HttpGet]
+        public async Task<IActionResult> CancelOrder(int id)
+        {
+            var selectedOrder = await _orderRepository.GetByIdAsync(id);
+            return View(selectedOrder);
+        }
+
+        // POST: CancelOrder
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("CancelOrder")] // Ensures routing matches GET action
+        public async Task<IActionResult> CancelOrderConfirmed(int id)
+        {
+            try
+            {
+                await _orderRepository.DeleteAsync(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                var selectedOrder = await _orderRepository.GetByIdAsync(id);
+                return View(selectedOrder);
+            }
         }
     }
 }

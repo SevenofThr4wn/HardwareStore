@@ -1,11 +1,11 @@
-﻿using HardwareStore.Data.Helper;
-using HardwareStore.Data.Context;
+﻿using HardwareStore.Data.Context;
+using HardwareStore.Data.Helper;
 using HardwareStore.Data.Repositories;
 using HardwareStore.Data.Repositories.Interfaces;
 using HardwareStore.Services;
 using HardwareStore.Services.Helpers;
-using HardwareStore.Services.Interfaces;
 using HardwareStore.Services.Implementations;
+using HardwareStore.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -37,7 +37,7 @@ namespace HardwareStore.Extensions.Extensions
             // Add HttpClient factory first
             services.AddHttpClient();
 
-            
+
             services.AddScoped<Keycloak.Net.KeycloakClient>(sp =>
             {
                 var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();

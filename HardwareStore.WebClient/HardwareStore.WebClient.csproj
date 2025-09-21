@@ -8,6 +8,13 @@
 	<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Views\Products\**" />
+    <Content Remove="Views\Products\**" />
+    <EmbeddedResource Remove="Views\Products\**" />
+    <None Remove="Views\Products\**" />
+  </ItemGroup>
+
 	
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.9" />
@@ -31,7 +38,6 @@
 
   <ItemGroup>
     <Folder Include="ViewModels\Profile\" />
-    <Folder Include="Views\Products\" />
   </ItemGroup>
 
 </Project>

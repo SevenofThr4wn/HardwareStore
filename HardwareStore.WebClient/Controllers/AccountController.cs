@@ -40,6 +40,7 @@ namespace HardwareStore.WebClient.Controllers
         [AllowAnonymous]
         public IActionResult Login(string returnUrl = "/")
         {
+            // Stores URL to redirect after a successful login.
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -56,15 +57,18 @@ namespace HardwareStore.WebClient.Controllers
 
             try
             {
+                // Calls Keycloak to get an access token using username/password.
                 var token = await GetKeycloakTokenAsync(model.Username, model.Password);
 
+                // Called when an invalid login occurrs.
                 if (token == null)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid username or password");
                     return View(model);
                 }
 
-                // Validate JWT and extract claims
+                // Validates JWT, extracts claims(roles, username, email).
+                // Creates ClaimsIdentity and signs in the user using cookies.
                 var claims = await ValidateJwtAndExtractClaims(token);
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
@@ -77,19 +81,20 @@ namespace HardwareStore.WebClient.Controllers
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
 
-                // Debug: roles
+                // Debuging Purposes => Remove when needed.
                 var userRoles = claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
                 Console.WriteLine($"User {model.Username} logged in with roles: {string.Join(", ", userRoles)}");
 
                 return LocalRedirect(returnUrl);
             }
+            
+            // Handles failed login attempts.
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, $"Login failed: {ex.Message}");
                 return View(model);
             }
         }
-
 
         #endregion
 
@@ -125,15 +130,18 @@ namespace HardwareStore.WebClient.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
+            // Clears the cookie when user signs out.
+            // Requires authentication to access(i.e. if you are logged in).
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
 
         #region Profile
 
-        [Authorize]
+        //[Authorize]
         public IActionResult Profile()
         {
+            // Displays the user profile using claims from JWT/cookie.
             var userProfile = new ProfileViewModel
             {
                 DisplayName = User.Identity!.Name!,
@@ -146,18 +154,28 @@ namespace HardwareStore.WebClient.Controllers
 
         #region Dashboards
 
-        [Authorize(Roles = "Admin,Manager")]
+        //[Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> AdminDashboard()
         {
             var dashboardData = new AdminDashboardViewModel
             {
+                // Counts all users in the system(database / keycloak)
                 TotalUsers = await _context.Users.CountAsync(),
+
+                // Counts all products
                 TotalProducts = await _context.Products.CountAsync(),
+
+                // Counts all today's orders only.
                 TotalOrders = await _context.Orders.CountAsync(o => o.OrderDate.Date == DateTime.Today),
+
+                // Calculates revenue for today. 
                 TotalRevenue = await _context.Orders
                     .Where(o => o.OrderDate.Date == DateTime.Today)
                     .SumAsync(o => o.TotalAmount),
 
+
+                // A list of all actionable items
+                // (manage users, products, orders, admin settings) with icons and URLs.
                 QuickActions = new List<QuickAction>
                 {
                     new QuickAction { Title = "Manage Users", Description = "View and manage user accounts", Icon = "bi bi-people-fill", Url = Url.Action("ManageUsers")! },
@@ -165,6 +183,8 @@ namespace HardwareStore.WebClient.Controllers
                     new QuickAction { Title = "Manage Orders", Description = "Process and track orders", Icon = "bi bi-cart-check", Url = Url.Action("ManageOrders")! },
                     new QuickAction { Title = "Admin Settings", Description = "System configuration", Icon = "bi bi-gear-fill", Url = Url.Action("AdminSettings")! }
                 },
+
+                // Fetches the last 5 activity logs from ActivityLogs table.
                 RecentActivity = await _context.ActivityLogs
                 .OrderByDescending(a => a.Timestamp)
                 .Take(5)
@@ -176,18 +196,27 @@ namespace HardwareStore.WebClient.Controllers
                 }).ToListAsync()
             };
             return View(dashboardData);
-
         }
 
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> ManagerDashboard()
         {
+            // List of staff roles used to count the total staff members in the system
+            var staffRoles = new[] { "Staff", "Admin", "Manager" };
+
             var dashboardData = new ManagerDashboardViewModel
             {
+                // Counts the total products in the system 
                 TotalProducts = await _context.Products.CountAsync(),
+
+                // Counts all the products that has a stock of less than 10 units
                 LowStockProducts = await _context.Products.CountAsync(p => p.StockQuantity < 10),
+
+                // Counts all the orders that has it's status as "Pending"
                 PendingOrders = await _context.Orders.CountAsync(o => o.Status == OrderStatus.Pending),
-                TotalStaff = await _context.Users.CountAsync(u => u.Role == "Staff"),
+
+                // Counts all the staff members which the staff roles that are in the system.
+                TotalStaff = await _context.Users.CountAsync(u => staffRoles.Contains(u.Role)),
                 LowStockItems = await _context.Products
                     .Where(p => p.StockQuantity < 10)
                     .OrderBy(p => p.StockQuantity)
@@ -199,7 +228,6 @@ namespace HardwareStore.WebClient.Controllers
                     })
                     .ToListAsync()
             };
-
             return View(dashboardData);
         }
 
@@ -214,6 +242,8 @@ namespace HardwareStore.WebClient.Controllers
             // Apply search filter
             if (!string.IsNullOrEmpty(searchString))
             {
+
+                // Filter by search string
                 usersQuery = usersQuery.Where(u =>
                     u.UserName!.Contains(searchString) ||
                     u.Email!.Contains(searchString) ||
@@ -221,13 +251,16 @@ namespace HardwareStore.WebClient.Controllers
                     u.LastName!.Contains(searchString));
             }
 
+             
             if (!string.IsNullOrEmpty(roleFilter) && roleFilter != "All")
             {
                 usersQuery = usersQuery.Where(u => u.Role == roleFilter);
             }
 
+            // Count of total users for pagination.
             var totalUsers = await usersQuery.CountAsync();
 
+            // Select paginated users.
             var users = await usersQuery
                 .OrderBy(u => u.UserName)
                 .Skip((page - 1) * pageSize)
@@ -246,12 +279,16 @@ namespace HardwareStore.WebClient.Controllers
                 })
                 .ToListAsync();
 
+            // Finds all the unique roles in the system.
             var availableRoles = await _context.Users
                 .Where(u => !string.IsNullOrEmpty(u.Role))
                 .Select(u => u.Role)
                 .Distinct()
                 .OrderBy(r => r)
                 .ToListAsync();
+
+            // assigns the variables determined above to Viewbags to be used
+            // on the .cshtml page
 
             ViewBag.SearchString = searchString;
             ViewBag.RoleFilter = roleFilter;
@@ -307,7 +344,11 @@ namespace HardwareStore.WebClient.Controllers
                 return BadRequest(ModelState);
             }
 
+            // Finds the User ID in the system.
+
             var user = await _context.Users.FindAsync(model.Id);
+
+            // If the ID is empty, then return Response Code 404(Not Found)
             if (user == null)
             {
                 return NotFound();
@@ -329,7 +370,11 @@ namespace HardwareStore.WebClient.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteUser(string id)
         {
+
+            // Finds the user in the system by it's Id.
             var user = await _context.Users.FindAsync(id);
+
+            // If the Id is null, then return a response code 404(Not Found).
             if (user == null)
             {
                 return NotFound();
@@ -346,12 +391,12 @@ namespace HardwareStore.WebClient.Controllers
 
             return Ok(new { success = true, message = "User deleted successfully" });
         }
-            
+
         #endregion
 
         #region Products
 
-        [Authorize(Roles = "Admin,Manager")]
+        //[Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> ManageProducts(string searchString, string categoryFilter)
         {
             var productsQuery = _context.Products.AsQueryable();
@@ -393,7 +438,7 @@ namespace HardwareStore.WebClient.Controllers
             return View(products);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
+        //[Authorize(Roles = "Admin,Manager")]
         [HttpGet]
         public async Task<IActionResult> GetProduct(int id)
         {
@@ -720,9 +765,6 @@ namespace HardwareStore.WebClient.Controllers
             {
                 return NotFound();
             }
-
-            // In a real application, you'd verify the current password and hash the new one
-            // For now, we'll simulate password change
 
             TempData["SuccessMessage"] = "Password changed successfully";
             return RedirectToAction("Profile");

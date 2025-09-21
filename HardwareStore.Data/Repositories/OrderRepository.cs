@@ -37,10 +37,12 @@ namespace HardwareStore.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Order order)
+        public async Task<int> DeleteAsync(int id)
         {
-            _context.Orders.Remove(order);
-            await _context.SaveChangesAsync();
+            var order = await _context.Orders
+                .Where(b => b.Id == id)
+                .ExecuteDeleteAsync();
+            return order;
         }
     }
 }

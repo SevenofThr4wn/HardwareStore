@@ -17,7 +17,7 @@ namespace HardwareStore.Services.Helpers
             _services = services;
         }
 
-        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Keycloak User Sync Service started.");
 
