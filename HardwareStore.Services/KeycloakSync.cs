@@ -1,4 +1,5 @@
-﻿using HardwareStore.Data.Context;
+﻿using HardwareStore.Core.Models;
+using HardwareStore.Data.Context;
 using HardwareStore.Data.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
@@ -118,7 +119,7 @@ namespace HardwareStore.Services
                     var primaryRole = DeterminePrimaryRole(userRoles) ?? "Staff";
                     Console.WriteLine($"Primary role determined: {primaryRole}");
 
-                    var user = await _context.Users.FirstOrDefaultAsync(u => u.KeyCloakId == kcUser.Id);
+                    var user = await _context.AppUsers.FirstOrDefaultAsync(u => u.KeyCloakId == kcUser.Id);
                     if (user == null)
                     {
                         Console.WriteLine($"Creating new user: {kcUser.Username}");
@@ -132,7 +133,7 @@ namespace HardwareStore.Services
                             IsActive = kcUser.Enabled,
                             Role = primaryRole
                         };
-                        _context.Users.Add(user);
+                        _context.AppUsers.Add(user);
                     }
                     else
                     {

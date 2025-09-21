@@ -4,11 +4,11 @@ namespace HardwareStore.Data.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetAllAsync();
-        Task<User> GetByIdAsync(string id);
-        Task<User> GetByEmailAsync(string email);
-        Task AddAsync(User user);
-        Task UpdateAsync(User user);
-        Task DeleteAsync(User user);
+        Task<IEnumerable<ApplicationUser>> GetAllAsync();
+        Task<ApplicationUser> GetByIdAsync(string id);
+        Task<ApplicationUser> GetByEmailAsync(string email);
+        Task AddAsync(ApplicationUser user);
+        Task UpdateAsync(ApplicationUser user);
+        Task DeleteAsync(ApplicationUser user);
     }
 }

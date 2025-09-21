@@ -1,6 +1,5 @@
 ﻿using HardwareStore.Core.Models;
 using HardwareStore.Data.Context;
-using HardwareStore.Services.Interfaces;
 using HardwareStore.WebClient.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

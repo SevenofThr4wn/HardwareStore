@@ -8,16 +8,16 @@ namespace HardwareStore.Core.Models
         [Key, Column("order_item_id")]
         public int Id { get; set; }
 
-        [Column("order_id")]
+        [Required, Column("order_id")]
         public int OrderId { get; set; }
 
-        [Column("product_id")]
+        [Required, Column("product_id")]
         public int ProductId { get; set; }
 
-        [Column("unit_price", TypeName = "decimal(18,2)")]
+        [Required, Column("unit_price", TypeName = "decimal(18,2)")]
         public decimal UnitPrice { get; set; }
 
-        [Column("quantity")]
+        [Required, Column("quantity")]
         public int Quantity { get; set; }
 
         // Navigation Properties

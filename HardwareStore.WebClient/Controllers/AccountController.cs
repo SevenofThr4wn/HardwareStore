@@ -1,6 +1,7 @@
 ﻿using HardwareStore.Core.Enums;
 using HardwareStore.Core.Models;
 using HardwareStore.Data.Context;
+using HardwareStore.Data.Repositories.Interfaces;
 using HardwareStore.WebClient.Models;
 using HardwareStore.WebClient.ViewModels;
 using HardwareStore.WebClient.ViewModels.Account;
@@ -28,15 +29,23 @@ namespace HardwareStore.WebClient.Controllers
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly AppDbContext _context;
+        private readonly IUserRepository _userRepository;
 
-        public AccountController(HttpClient httpClient, IConfiguration configuration, AppDbContext context)
+        public AccountController(HttpClient httpClient, IConfiguration configuration, AppDbContext context, IUserRepository userRepository)
         {
             _httpClient = httpClient;
             _configuration = configuration;
             _context = context;
+            _userRepository = userRepository;
         }
 
         #region Login
+
+        /// <summary>
+        /// Displays the login page.
+        /// </summary>
+        /// <param name="returnUrl">The URL to redirect the user to after a successful login (defaults to "/").</param>
+        /// <returns>The login view.</returns>
         [AllowAnonymous]
         public IActionResult Login(string returnUrl = "/")
         {
@@ -45,6 +54,12 @@ namespace HardwareStore.WebClient.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Handles login requests and signs in the user if credentials are valid.
+        /// </summary>
+        /// <param name="model">The login form data.</param>
+        /// <param name="returnUrl">The URL to redirect to after a successful login.</param>
+        /// <returns>The login view with errors, or a redirect on success.</returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -87,7 +102,7 @@ namespace HardwareStore.WebClient.Controllers
 
                 return LocalRedirect(returnUrl);
             }
-            
+
             // Handles failed login attempts.
             catch (Exception ex)
             {
@@ -100,9 +115,20 @@ namespace HardwareStore.WebClient.Controllers
 
         #region Register
 
+
+        /// <summary>
+        /// Displays the registration page.
+        /// </summary>
+        /// <returns>The registration view.</returns>
         [AllowAnonymous]
         public IActionResult Register() => View();
 
+
+        /// <summary>
+        /// Handles registration requests and creates a new user.
+        /// </summary>
+        /// <param name="viewModel">The registration form data.</param>
+        /// <returns>The registration view with errors, or a redirect on success.</returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -216,7 +242,7 @@ namespace HardwareStore.WebClient.Controllers
                 PendingOrders = await _context.Orders.CountAsync(o => o.Status == OrderStatus.Pending),
 
                 // Counts all the staff members which the staff roles that are in the system.
-                TotalStaff = await _context.Users.CountAsync(u => staffRoles.Contains(u.Role)),
+                TotalStaff = await _context.AppUsers.CountAsync(u => staffRoles.Contains(u.Role)),
                 LowStockItems = await _context.Products
                     .Where(p => p.StockQuantity < 10)
                     .OrderBy(p => p.StockQuantity)
@@ -237,7 +263,7 @@ namespace HardwareStore.WebClient.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> ManageUsers(string searchString, string roleFilter, int page = 1, int pageSize = 10)
         {
-            var usersQuery = _context.Users.AsQueryable();
+            var usersQuery = _context.AppUsers.AsQueryable();
 
             // Apply search filter
             if (!string.IsNullOrEmpty(searchString))
@@ -251,7 +277,7 @@ namespace HardwareStore.WebClient.Controllers
                     u.LastName!.Contains(searchString));
             }
 
-             
+
             if (!string.IsNullOrEmpty(roleFilter) && roleFilter != "All")
             {
                 usersQuery = usersQuery.Where(u => u.Role == roleFilter);
@@ -280,7 +306,7 @@ namespace HardwareStore.WebClient.Controllers
                 .ToListAsync();
 
             // Finds all the unique roles in the system.
-            var availableRoles = await _context.Users
+            var availableRoles = await _context.AppUsers
                 .Where(u => !string.IsNullOrEmpty(u.Role))
                 .Select(u => u.Role)
                 .Distinct()
@@ -292,7 +318,7 @@ namespace HardwareStore.WebClient.Controllers
 
             ViewBag.SearchString = searchString;
             ViewBag.RoleFilter = roleFilter;
-            ViewBag.AvailableRoles = availableRoles;
+            ViewBag.AvailableRoles = availableRoles!;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
             ViewBag.TotalUsers = totalUsers;
@@ -305,7 +331,7 @@ namespace HardwareStore.WebClient.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUser(string id)
         {
-            var user = await _context.Users
+            var user = await _context.AppUsers
                 .Where(u => u.Id == id)
                 .Select(u => new UserEditModel
                 {
@@ -325,7 +351,7 @@ namespace HardwareStore.WebClient.Controllers
             }
 
             // Get available roles from database
-            var availableRoles = await _context.Users
+            var availableRoles = await _context.AppUsers
                 .Where(u => !string.IsNullOrEmpty(u.Role))
                 .Select(u => u.Role)
                 .Distinct()
@@ -346,7 +372,7 @@ namespace HardwareStore.WebClient.Controllers
 
             // Finds the User ID in the system.
 
-            var user = await _context.Users.FindAsync(model.Id);
+            var user = await _context.AppUsers.FindAsync(model.Id);
 
             // If the ID is empty, then return Response Code 404(Not Found)
             if (user == null)
@@ -372,7 +398,7 @@ namespace HardwareStore.WebClient.Controllers
         {
 
             // Finds the user in the system by it's Id.
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userRepository.GetByIdAsync(id);
 
             // If the Id is null, then return a response code 404(Not Found).
             if (user == null)
@@ -386,7 +412,7 @@ namespace HardwareStore.WebClient.Controllers
                 return BadRequest(new { success = false, message = "Cannot delete your own account" });
             }
 
-            _context.Users.Remove(user);
+            _context.AppUsers.Remove(user);
             await _context.SaveChangesAsync();
 
             return Ok(new { success = true, message = "User deleted successfully" });
@@ -555,7 +581,7 @@ namespace HardwareStore.WebClient.Controllers
                     ItemCount = o.OrderItems.Sum(oi => oi.Quantity),
                     Items = o.OrderItems.Select(oi => new OrderItemViewModel
                     {
-                        ProductName = oi.Product.Name,
+                        ProductName = oi.Product!.Name,
                         Quantity = oi.Quantity,
                         Price = (double)oi.UnitPrice,
                     }).ToList()
@@ -597,7 +623,7 @@ namespace HardwareStore.WebClient.Controllers
                 ShippingCountry = order.ShippingCountry,
                 Items = order.OrderItems.Select(oi => new OrderItemDetailsViewModel
                 {
-                    ProductName = oi.Product.Name,
+                    ProductName = oi.Product!.Name,
                     ProductId = oi.Product.ProductId,
                     Quantity = oi.Quantity,
                     Price = oi.UnitPrice,
@@ -606,10 +632,10 @@ namespace HardwareStore.WebClient.Controllers
                 }).ToList(),
                 User = new OrderUserViewModel
                 {
-                    UserName = order.User.Username,
+                    UserName = order.User.UserName,
                     Email = order.User.Email,
-                    FirstName = order.User.FirstName,
-                    LastName = order.User.LastName
+                    FirstName = order.User.FirstName!,
+                    LastName = order.User.LastName!
                 }
             };
 
@@ -641,14 +667,14 @@ namespace HardwareStore.WebClient.Controllers
                 {
                     Id = o.Id,
                     OrderNumber = o.OrderNo,
-                    CustomerName = o.User.Username,
-                    CustomerEmail = o.User.Email,
+                    CustomerName = o.User.UserName!,
+                    CustomerEmail = o.User.Email!,
                     OrderDate = o.OrderDate,
                     TotalAmount = o.TotalAmount,
                     Status = o.Status.ToString(),
                     Items = o.OrderItems.Select(oi => new OrderItemViewModel
                     {
-                        ProductName = oi.Product.Name,
+                        ProductName = oi.Product!.Name,
                         Quantity = oi.Quantity,
                         Price = (double)oi.UnitPrice
                     }).ToList()

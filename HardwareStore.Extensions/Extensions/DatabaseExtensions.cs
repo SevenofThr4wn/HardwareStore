@@ -1,5 +1,5 @@
-﻿using HardwareStore.Data.Context;
-using HardwareStore.Data.Identity;
+﻿using HardwareStore.Core.Models;
+using HardwareStore.Data.Context;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

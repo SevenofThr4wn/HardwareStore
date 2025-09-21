@@ -45,7 +45,7 @@ namespace HardwareStore.Core.Models
 
         //Navigation properties
 
-        public virtual User User { get; set; } = null!;
+        public virtual ApplicationUser User { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
         // Computed properties

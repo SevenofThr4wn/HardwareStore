@@ -9,35 +9,34 @@ namespace HardwareStore.Core.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ProductId { get; set; }
 
-        [Required]
-        [StringLength(150)]
+        [Required, Column("product_name") ,StringLength(100)]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(1000)]
+        [Required, Column("product_description") ,StringLength(1000)]
         public string Description { get; set; } = string.Empty;
 
         [Required]
-        [Column(TypeName = "decimal(18,2)")]
+        [Column("product_price", TypeName = "decimal(18,2)")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
         public decimal Price { get; set; }
 
-        [Required]
-        [Range(0, int.MaxValue)]
+        [Required, Column("stock_quantity"), Range(0, int.MaxValue)]
         public int StockQuantity { get; set; }
 
-        [Required]
-        [StringLength(100)]
+        [Required, Column("category"), StringLength(100)]
         public string Category { get; set; } = string.Empty;
 
-        [StringLength(500)]
+        [Column("image_url"),StringLength(500)]
         public string? ImageUrl { get; set; }
 
+        [Required, Column("is_active")]
         public bool IsActive { get; set; } = true;
 
         [Required]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-        public DateTime? UpdatedDate { get; set; }
+        [Column("date_updated")]
+        public DateTime? Updated { get; set; }
 
         // Computed Properties
 
@@ -54,7 +53,7 @@ namespace HardwareStore.Core.Models
                 throw new InvalidOperationException("Insufficient stock");
 
             StockQuantity += quantity;
-            UpdatedDate = DateTime.UtcNow;
+            Updated = DateTime.UtcNow;
         }
     }
 }

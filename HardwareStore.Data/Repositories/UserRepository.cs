@@ -14,36 +14,36 @@ namespace HardwareStore.Data.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public async Task<IEnumerable<ApplicationUser>> GetAllAsync()
         {
             return await _context.AppUsers.ToListAsync();
         }
 
-        public async Task<User> GetByEmailAsync(string email)
+        public async Task<ApplicationUser> GetByEmailAsync(string email)
         {
             var user = await _context.AppUsers.FirstOrDefaultAsync(u => u.Email == email);
             return user!;
         }
 
-        public async Task<User> GetByIdAsync(string id)
+        public async Task<ApplicationUser> GetByIdAsync(string id)
         {
             var user = await _context.AppUsers.FindAsync(id);
             return user!;
         }
 
-        public async Task AddAsync(User user)
+        public async Task AddAsync(ApplicationUser user)
         {
             await _context.AppUsers.AddAsync(user);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(User user)
+        public async Task UpdateAsync(ApplicationUser user)
         {
             _context.AppUsers.Update(user);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(User user)
+        public async Task DeleteAsync(ApplicationUser user)
         {
             _context.AppUsers.Remove(user);
             await _context.SaveChangesAsync();
