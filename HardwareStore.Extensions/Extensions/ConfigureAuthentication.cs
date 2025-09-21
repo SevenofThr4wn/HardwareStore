@@ -16,22 +16,33 @@ namespace HardwareStore.Extensions.Extensions
     {
         public static IServiceCollection ConfigureKeycloakAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
+            // Reads the Keycloak server URL and client id from appsettings.json
             var authority = configuration["Keycloak:Authority"];
             var clientId = configuration["Keycloak:ClientId"];
 
+            // throws an error if Authority is missing in the json file.
             if (string.IsNullOrEmpty(authority))
                 throw new InvalidOperationException("Keycloak:Authority must be configured. Please see appsettings.json for more information");
 
+            // Ensures the authority URL ends with a / for proper URI concatentation.
             if (!authority.EndsWith("/")) authority += "/";
 
+            // Builds the well-known OpenID Connect configuration URL
+            // Example: https://keycloak.example.com/auth/realms/myrealm/.wel-known/openid-configuration
             var wellKnownUrl = new Uri(new Uri(authority), ".well-known/openid-configuration").AbsoluteUri;
 
+            // Creates a ConfigurationManager that fetches Keycloak's OpenID configuration dynamically.
+            // RequireHttps = false allows non-https connections
             var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
                 wellKnownUrl,
                 new OpenIdConnectConfigurationRetriever(),
                 new HttpDocumentRetriever { RequireHttps = false }
             );
 
+            // Registers authentication schemes
+            //      - Default scheme: cookie-based authentication
+            //      - Default challenge: JWT Bearer(used when the user needs to login).
+            //      - Default sign-in & authentication cookies
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -39,6 +50,10 @@ namespace HardwareStore.Extensions.Extensions
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
+            // Configures Cookie authentication'
+            //      - Login and Access Denied paths
+            //      - Sliding expiration => extends the cookie lifetime when the user is active.
+            //      - Cookie expires after 120 minutes.
             .AddCookie(options =>
             {
                 options.LoginPath = "/Account/Login";
@@ -46,6 +61,11 @@ namespace HardwareStore.Extensions.Extensions
                 options.SlidingExpiration = true;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(120);
             })
+
+            // Configures JWT Bearer authentication
+            //      - Authority => Keycloak Server
+            //      - RequireHttpsMetadata = false => allows HTTP.
+            //      - ConfigurationManager => uses the OpenID configuration fetched earlier
             .AddJwtBearer(options =>
             {
                 options.Authority = authority;
@@ -53,7 +73,12 @@ namespace HardwareStore.Extensions.Extensions
                 options.ConfigurationManager = configurationManager;
 
 
-                // Configures JWT Token Validation Parameters
+                // JWT validation paramters
+                //      - Validates issuer, audience, and token lifetime.
+                //      - Maps Keycloak claims to .NET claims
+                //          - preffered_username => Name
+                //          - ClaimTypes.Role => Roles
+                //      - Custom AudienceValidator => checks multiple claims in Keycloak JWTs. 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -89,6 +114,7 @@ namespace HardwareStore.Extensions.Extensions
                             }
                             catch
                             {
+                                Console.WriteLine("Error whilst reading JSON document");
                             }
                         }
 
@@ -99,7 +125,12 @@ namespace HardwareStore.Extensions.Extensions
                     }
                 };
 
-                // Configures Events to handle token validation and role extraction
+                // JWT events
+                //      - OnTokenValidated => triggered after sucessful token validation"
+                //          - Clears old roles
+                //          - Add roles from Keycloak JSON claims.
+                //          - Logs roles to console.
+                //      - OnAuthenticationFailed => triggered if JWT validation fails; log the exception.
                 options.Events = new JwtBearerEvents
                 {
                     OnTokenValidated = context =>
@@ -114,11 +145,15 @@ namespace HardwareStore.Extensions.Extensions
 
                             AddRolesFromJsonClaim(identity, "resource_access", null);
 
+                            // If sucessfully validates all the user claims, print message to the console
                             var rolesFound = identity.FindAll(ClaimTypes.Role).Select(c => c.Value).Distinct();
                             Console.WriteLine("JWT successfully validated with roles: " + string.Join(", ", rolesFound));
                         }
                         return Task.CompletedTask;
                     },
+
+                    // If the user authentication fails,
+                    // then a message is printed to the console window with the exception message.
                     OnAuthenticationFailed = context =>
                     {
                         Console.WriteLine("JWT authentication failed: " + context.Exception?.Message);
@@ -127,6 +162,9 @@ namespace HardwareStore.Extensions.Extensions
                 };
             });
 
+            // Registers authorization policies
+            //  - Require authenticated user.
+            //  - Require specific role(Admin, Staff, etc.).
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("RequireAuthenticatedUser", p => p.RequireAuthenticatedUser());
@@ -134,6 +172,7 @@ namespace HardwareStore.Extensions.Extensions
                 options.AddPolicy("RequireStaffRole", p => p.RequireRole("Staff", "Admin", "Manager"));
             });
 
+            // Registers a custom roles transformer to map JWT claims to cookie claims.
             services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
 
             return services;
@@ -158,7 +197,7 @@ namespace HardwareStore.Extensions.Extensions
                             identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
                     }
                 }
-                else if (root.ValueKind == JsonValueKind.Array) // handle arrays like your realm_access
+                else if (root.ValueKind == JsonValueKind.Array)
                 {
                     foreach (var role in root.EnumerateArray())
                     {
@@ -167,7 +206,7 @@ namespace HardwareStore.Extensions.Extensions
                             identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
                     }
                 }
-                else if (rolesProperty == null && root.ValueKind == JsonValueKind.Object) // resource_access
+                else if (rolesProperty == null && root.ValueKind == JsonValueKind.Object)
                 {
                     foreach (var client in root.EnumerateObject())
                     {
