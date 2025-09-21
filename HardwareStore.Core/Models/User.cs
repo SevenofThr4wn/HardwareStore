@@ -8,8 +8,11 @@ namespace HardwareStore.Core.Models
         [Key, Column("user_id")]
         public string UserId { get; set; } = Guid.NewGuid().ToString();
 
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
+        [Column("first_name"), StringLength(80)]
+        public string? FirstName { get; set; }
+
+        [Column("last_name"), StringLength(80)]
+        public string? LastName { get; set; }
 
         [Required, MaxLength(100), Column("username")]
         public string Username { get; set; } = string.Empty;

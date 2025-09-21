@@ -14,6 +14,15 @@ namespace HardwareStore.Extensions.Extensions
 {
     public static class ConfigureAuthentication
     {
+        /// <summary>
+        /// Configures authentication and authorization for Keycloak integration.
+        /// Sets up cookie and JWT bearer authentication, maps Keycloak claims to .NET claims,
+        /// and registers authorization policies and claims transformation.
+        /// </summary>
+        /// <param name="services">The service collection to add authentication services to.</param>
+        /// <param name="configuration">The application configuration containing Keycloak settings.</param>
+        /// <returns>The updated service collection.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if Keycloak:Authority is not configured.</exception>
         public static IServiceCollection ConfigureKeycloakAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             // Reads the Keycloak server URL and client id from appsettings.json
@@ -178,6 +187,13 @@ namespace HardwareStore.Extensions.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Adds role claims from a JSON claim in the JWT to the provided ClaimsIdentity.
+        /// Handles both "realm_access" and "resource_access" claim structures from Keycloak.
+        /// </summary>
+        /// <param name="identity">The ClaimsIdentity to add roles to.</param>
+        /// <param name="claimType">The claim type to extract roles from (e.g., "realm_access" or "resource_access").</param>
+        /// <param name="rolesProperty">The property name within the claim that contains the roles array, or null for "resource_access".</param>
         private static void AddRolesFromJsonClaim(ClaimsIdentity identity, string claimType, string? rolesProperty)
         {
             var claim = identity.FindFirst(claimType);

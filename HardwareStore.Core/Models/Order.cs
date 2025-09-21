@@ -20,7 +20,7 @@ namespace HardwareStore.Core.Models
         [Required, Column("total_amount", TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
 
-        [StringLength(20), Required, Column("order_status")]
+        [Required, Column("order_status")]
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
         [Required, Column("order_date")]

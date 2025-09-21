@@ -1,4 +1,5 @@
-﻿using HardwareStore.Core.Models;
+﻿using HardwareStore.Core.Enums;
+using HardwareStore.Core.Models;
 using HardwareStore.Data.Context;
 using HardwareStore.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,17 @@ namespace HardwareStore.Data.Repositories
         {
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateOrderStatusAsync(int orderId, OrderStatus status)
+        {
+            var order = await GetByIdAsync(orderId);
+
+            if (order == null)
+                return;
+
+            order.Status = status;
+            await UpdateAsync(order);
         }
 
         public async Task<int> DeleteAsync(int id)

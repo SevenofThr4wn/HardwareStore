@@ -1,4 +1,4 @@
-﻿namespace HardwareStore.Data.Helper
+﻿namespace HardwareStore.Data.Models
 {
     public class KeycloakOptions
     {

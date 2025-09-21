@@ -10,7 +10,7 @@ namespace HardwareStore.Core.Models
         public int ProductId { get; set; }
 
         [Required]
-        [StringLength(200)]
+        [StringLength(150)]
         public string Name { get; set; } = string.Empty;
 
         [StringLength(1000)]
@@ -39,7 +39,8 @@ namespace HardwareStore.Core.Models
 
         public DateTime? UpdatedDate { get; set; }
 
-        // Computed properties (not mapped to database)
+        // Computed Properties
+
         [NotMapped]
         public bool IsInStock => StockQuantity > 0;
 

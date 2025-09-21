@@ -1,4 +1,5 @@
-﻿using HardwareStore.Core.Models;
+﻿using HardwareStore.Core.Enums;
+using HardwareStore.Core.Models;
 
 namespace HardwareStore.Data.Repositories.Interfaces
 {
@@ -9,5 +10,7 @@ namespace HardwareStore.Data.Repositories.Interfaces
         Task AddAsync(Order order);
         Task UpdateAsync(Order order);
         Task<int> DeleteAsync(int id);
+
+        Task UpdateOrderStatusAsync(int orderId, OrderStatus status);
     }
 }

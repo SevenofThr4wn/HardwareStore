@@ -154,7 +154,7 @@ namespace HardwareStore.WebClient.Controllers
 
         #region Dashboards
 
-        //[Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> AdminDashboard()
         {
             var dashboardData = new AdminDashboardViewModel
@@ -780,6 +780,14 @@ namespace HardwareStore.WebClient.Controllers
 
         #region Authentication Methods
 
+        /// <summary>
+        /// Requests an access token from Keycloak using the Resource Owner Password Credentials grant.
+        /// </summary>
+        /// <param name="username">The username of the user attempting to log in.</param>
+        /// <param name="password">The password of the user attempting to log in.</param>
+        /// <returns>
+        /// A JWT access token as a string if authentication is successful; otherwise, <c>null</c>.
+        /// </returns>
         private async Task<string?> GetKeycloakTokenAsync(string username, string password)
         {
             var keycloakUrl = _configuration["Keycloak:ServerUrl"];
@@ -801,6 +809,11 @@ namespace HardwareStore.WebClient.Controllers
             return json.RootElement.GetProperty("access_token").GetString();
         }
 
+        /// <summary>
+        /// Creates a new user in Keycloak using the provided registration view model.
+        /// </summary>
+        /// <param name="viewModel">The registration data for the new user.</param>
+        /// <returns>True if the user was created successfully; otherwise, false.</returns>
         private async Task<bool> CreateKeycloakUserAsync(RegisterViewModel viewModel)
         {
             var token = await GetAdminTokenAsync();
@@ -827,6 +840,12 @@ namespace HardwareStore.WebClient.Controllers
             return response.IsSuccessStatusCode;
         }
 
+        /// <summary>
+        /// Validates a JWT token and extracts claims, including Keycloak realm and resource roles.
+        /// </summary>
+        /// <param name="token">The JWT access token to validate and extract claims from.</param>
+        /// <returns>A list of claims extracted from the validated token.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if Keycloak authority is not configured.</exception>
         private async Task<List<Claim>> ValidateJwtAndExtractClaims(string token)
         {
             var authority = _configuration["Keycloak:Authority"];
@@ -872,7 +891,7 @@ namespace HardwareStore.WebClient.Controllers
                     return false;
                 },
                 ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,   // <--- this was false before
+                ValidateIssuerSigningKey = true,
                 IssuerSigningKeys = signingKeys,
                 NameClaimType = "preferred_username",
                 RoleClaimType = ClaimTypes.Role
@@ -936,6 +955,11 @@ namespace HardwareStore.WebClient.Controllers
             return claims;
         }
 
+        /// <summary>
+        /// Gets an admin access token from Keycloak using the admin credentials configured in app settings.
+        /// Used for administrative operations such as user creation.
+        /// </summary>
+        /// <returns>The admin JWT access token as a string.</returns>
         private async Task<string> GetAdminTokenAsync()
         {
             var keycloakUrl = _configuration["Keycloak:ServerUrl"];

@@ -30,7 +30,7 @@ namespace HardwareStore.WebClient.Controllers
         // POST: CancelOrder
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [ActionName("CancelOrder")] // Ensures routing matches GET action
+        [ActionName("CancelOrder")]
         public async Task<IActionResult> CancelOrderConfirmed(int id)
         {
             try

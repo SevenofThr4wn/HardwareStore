@@ -17,6 +17,12 @@ namespace HardwareStore.Services.Helpers
             _services = services;
         }
 
+        /// <summary>
+        /// Periodically synchronizes users from Keycloak by invoking the KeycloakSync service.
+        /// Runs until the service is stopped or a cancellation is requested.
+        /// </summary>
+        /// <param name="stoppingToken">Token to monitor for cancellation requests.</param>
+        /// <returns>A Task representing the background operation.</returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Keycloak User Sync Service started.");

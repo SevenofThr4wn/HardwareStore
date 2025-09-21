@@ -13,13 +13,11 @@ namespace HardwareStore.WebClient.Controllers
     [Authorize]
     public class ProductController : Controller
     {
-        private readonly IProductService _productService;
         private readonly AppDbContext _context;
 
-        public ProductController(IProductService productService, AppDbContext context)
+        public ProductController(AppDbContext context)
         {
             _context = context;
-            _productService = productService;
         }
 
         // GET: Create Product page

@@ -13,13 +13,11 @@ namespace HardwareStore.Data.Context
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-
         public DbSet<ActivityLog> ActivityLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
 
             builder.Entity<OrderItem>()
                 .HasOne(oi => oi.Product)
@@ -35,8 +33,6 @@ namespace HardwareStore.Data.Context
                 .HasOne(o => o.User)
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.UserId);
-
-
         }
     }
 }

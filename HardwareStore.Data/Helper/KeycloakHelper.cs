@@ -1,4 +1,5 @@
-﻿using Keycloak.Net;
+﻿using HardwareStore.Data.Models;
+using Keycloak.Net;
 using Keycloak.Net.Models.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;

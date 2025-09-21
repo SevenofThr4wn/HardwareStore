@@ -1,5 +1,6 @@
 ﻿using HardwareStore.Data.Context;
 using HardwareStore.Data.Helper;
+using HardwareStore.Data.Models;
 using HardwareStore.Data.Repositories;
 using HardwareStore.Data.Repositories.Interfaces;
 using HardwareStore.Services;
@@ -16,10 +17,6 @@ namespace HardwareStore.Extensions.Extensions
         public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration config)
         {
             // Add Services to Web Client
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IOrderService, OrderService>();
-            services.AddScoped<IProductService, ProductService>();
             services.AddScoped<INotificationService, NotificationService>();
 
             // Configure Keycloak options
