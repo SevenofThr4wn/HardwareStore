@@ -9,10 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\Products\**" />
-    <Content Remove="Views\Products\**" />
-    <EmbeddedResource Remove="Views\Products\**" />
-    <None Remove="Views\Products\**" />
+    <Compile Remove="ViewModels\Profile\**" />
+    <Content Remove="ViewModels\Profile\**" />
+    <EmbeddedResource Remove="ViewModels\Profile\**" />
+    <None Remove="ViewModels\Profile\**" />
   </ItemGroup>
 
 	
@@ -34,10 +34,6 @@
   <ItemGroup>
     <ProjectReference Include="..\HardwareStore.Extensions\HardwareStore.Extensions.csproj" />
     <ProjectReference Include="..\HardwareStore.Services\HardwareStore.Services.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ViewModels\Profile\" />
   </ItemGroup>
 
 </Project>

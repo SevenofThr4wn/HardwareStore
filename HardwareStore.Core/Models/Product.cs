@@ -9,10 +9,10 @@ namespace HardwareStore.Core.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ProductId { get; set; }
 
-        [Required, Column("product_name") ,StringLength(100)]
+        [Required, Column("product_name"), StringLength(100)]
         public string Name { get; set; } = string.Empty;
 
-        [Required, Column("product_description") ,StringLength(1000)]
+        [Required, Column("product_description"), StringLength(1000)]
         public string Description { get; set; } = string.Empty;
 
         [Required]
@@ -26,7 +26,7 @@ namespace HardwareStore.Core.Models
         [Required, Column("category"), StringLength(100)]
         public string Category { get; set; } = string.Empty;
 
-        [Column("image_url"),StringLength(500)]
+        [Column("image_url"), StringLength(500)]
         public string? ImageUrl { get; set; }
 
         [Required, Column("is_active")]

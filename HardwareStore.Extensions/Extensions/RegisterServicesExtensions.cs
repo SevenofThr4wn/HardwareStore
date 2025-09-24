@@ -1,12 +1,12 @@
 ﻿using HardwareStore.Data.Context;
 using HardwareStore.Data.Helper;
 using HardwareStore.Data.Models;
-using HardwareStore.Data.Repositories;
-using HardwareStore.Data.Repositories.Interfaces;
-using HardwareStore.Services;
+using HardwareStore.Data.Models.Interfaces;
+using HardwareStore.Data.Models.Repositories;
 using HardwareStore.Services.Helpers;
 using HardwareStore.Services.Implementations;
 using HardwareStore.Services.Interfaces;
+using HardwareStore.Services.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -61,7 +61,7 @@ namespace HardwareStore.Extensions.Extensions
             services.AddScoped<KeycloakHelper>();
 
             // Adds the Sync Service to the application
-            services.AddScoped<KeycloakSync>(sp =>
+            services.AddScoped<KeyCloakSync>(sp =>
             {
                 var dbContext = sp.GetRequiredService<AppDbContext>();
                 var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
@@ -74,11 +74,11 @@ namespace HardwareStore.Extensions.Extensions
                 var adminUser = keycloakSection["AdminUser"]!;
                 var adminPassword = keycloakSection["AdminPassword"]!;
 
-                return new KeycloakSync(dbContext, httpClient, serverUrl, realm, adminUser, adminPassword);
+                return new KeyCloakSync(dbContext, httpClient, serverUrl, realm, adminUser, adminPassword);
             });
 
             // Registers the hosted service to sync the users to the SQL database.
-            services.AddHostedService<KeycloakUserSyncService>();
+            services.AddHostedService<KeyCloakSyncService>();
             return services;
         }
     }

@@ -13,7 +13,7 @@ namespace HardwareStore.Core.Models
         public string KeyCloakId { get; set; } = string.Empty;
 
         [Column("full_name"), StringLength(200)]
-        public string? FullName{ get; set; }
+        public string? FullName { get; set; }
 
         [Column("first_name"), StringLength(100)]
         public string? FirstName { get; set; } = string.Empty;

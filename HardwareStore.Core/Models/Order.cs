@@ -45,18 +45,14 @@ namespace HardwareStore.Core.Models
 
         //Navigation properties
 
-        public virtual ApplicationUser User { get; set; }
-        public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public virtual ApplicationUser? User { get; set; }
+        public virtual List<OrderItem> OrderItems { get; set; } = new();
 
         // Computed properties
         [NotMapped]
         public string FormattedOrderNumber => $"#{OrderNo}";
 
         [NotMapped]
-        public string FormattedTotalAmount => TotalAmount.ToString("C");
-
-        [NotMapped]
-        public string FormattedOrderDate => OrderDate.ToString("dd, MM, yyyy");
-
+        public string FullShippingAddress => $"{ShippingAddress}, {ShippingCity}, {ShippingPostalCode}, {ShippingCountry}";
     }
 }

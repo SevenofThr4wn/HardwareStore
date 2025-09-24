@@ -13,18 +13,21 @@ namespace HardwareStore.WebClient.Services
             _hubContext = hubContext;
         }
 
-        public async Task PublishAsync(string message, string? userId = null)
+        public async Task PublishAsync(string? id, string? title, string message)
         {
-            if (!string.IsNullOrEmpty(userId))
+            string safeTitle = title ?? string.Empty;
+
+            if (!string.IsNullOrEmpty(id))
             {
-                await _hubContext.Clients.User(userId)
-                    .SendAsync("ReceiveNotification", message);
+                await _hubContext.Clients.User(id)
+                    .SendAsync("ReceiveNotification", safeTitle, message);
             }
             else
             {
                 await _hubContext.Clients.All
-                    .SendAsync("ReceiveNotification", message);
+                    .SendAsync("ReceiveNotification", safeTitle, message);
             }
         }
+
     }
 }

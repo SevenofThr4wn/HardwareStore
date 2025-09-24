@@ -1,5 +1,5 @@
 ﻿using HardwareStore.Core.Models;
-using HardwareStore.Data.Repositories.Interfaces;
+using HardwareStore.Data.Models.Interfaces;
 using HardwareStore.Services.Interfaces;
 
 namespace HardwareStore.Services.Implementations
@@ -17,25 +17,37 @@ namespace HardwareStore.Services.Implementations
             _publisher = publisher;
         }
 
-        public async Task<IEnumerable<Notification>> GetUserNotificationsAsync(string userId)
+        /// <summary>
+        /// Retrieves the user's notifications by a provided record identifier.
+        /// </summary>
+        /// <param name="userId">The identifier of the user.</param>
+        /// <returns>The user object that matches the record id.</returns>
+        public async Task<IEnumerable<Notification>> GetUserNotificationsAsync(string id)
         {
-            return await _notificationRepository.GetByUserIdAsync(userId);
+            return await _notificationRepository.GetByUserIdAsync(id);
         }
 
-        public async Task SendNotificationAsync(string userId, string message)
+        /// <summary>
+        /// Sends a <see cref="Notification"/> to a <see cref="ApplicationUser"/> that is authenticated.
+        /// </summary>
+        /// <param name="id">The Id of the user that the notif will be sent to.</param>
+        /// <param name="message">The message that will be passed as the body of the notification.</param>
+        /// <returns></returns>
+        public async Task SendNotificationAsync(string id, string? title, string message)
         {
             var notification = new Notification
             {
-                UserId = userId,
+                UserId = id,
+                Title = title,
                 Message = message
             };
 
             await _notificationRepository.AddAsync(notification);
 
-            await _publisher.PublishAsync(message, userId);
+            await _publisher.PublishAsync(message, title, id);
         }
 
-        public async Task SendNotificationAsync(string message)
+        public async Task SendNotificationAsync(string? title, string message)
         {
             var notification = new Notification
             {
@@ -45,7 +57,7 @@ namespace HardwareStore.Services.Implementations
 
             await _notificationRepository.AddAsync(notification);
 
-            await _publisher.PublishAsync(message, null);
+            await _publisher.PublishAsync(message, title, null!);
         }
     }
 }

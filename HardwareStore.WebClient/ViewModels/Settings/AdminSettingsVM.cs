@@ -1,0 +1,11 @@
+﻿namespace HardwareStore.WebClient.ViewModels.Settings
+{
+    public class AdminSettingsVM
+    {
+        public string StoreName { get; set; } = string.Empty;
+        public string StoreEmail { get; set; } = string.Empty;
+        public string Currency { get; set; } = string.Empty;
+        public int SessionTimeout { get; set; }
+        public string PasswordPolicy { get; set; } = string.Empty;
+    }
+}
