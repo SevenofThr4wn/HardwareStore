@@ -41,6 +41,7 @@ View logs:
 ```bash
 docker logs -f keycloak
 ```
+NOTE: Make your once you log into your account, delete the temporary admin account and add a new master account, DO NOT FORGET to sign in before deleting the temp account or you will be locked out and will have to start from scratch!
 
 ---
 
@@ -55,7 +56,7 @@ docker logs -f keycloak
 ## 🌍 5. Create a Realm
 
 1. In the left sidebar → select **Realm selector** → **Create Realm**
-2. Name it: `HardwareStore`
+2. Name it: `HardwareStore` <-- If you choose another name, make sure to change the appsettings.json with your new realm name
 3. Save
 
 ---
@@ -65,12 +66,12 @@ docker logs -f keycloak
 1. Go to **Clients** → **Create client**
 2. Set values:
 
-   * Client ID: `hardwarestore-client`
+   * Client ID: `hardwarestore-client` <-- If you choose another client id, make sure to change the appsettings.json with your new client id
    * Name: `HardwareStore Client`
    * Client type: **OpenID Connect**
 3. Configure:
 
-   * Root URL: `https://localhost:7267`
+   * Root URL: `https://localhost:7267` <-- Or the port number that is used on machine
    * Valid redirect URIs: `https://localhost:7267/signin-oidc`
    * Web origins: add your frontend URL
 4. Save
@@ -85,7 +86,7 @@ docker logs -f keycloak
    * `Manager`
    * `Admin`
    * `Staff`
-   * `User`
+   * `User` <-- Optional
 
 ---
 
