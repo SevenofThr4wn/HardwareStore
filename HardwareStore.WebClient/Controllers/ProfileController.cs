@@ -8,14 +8,14 @@ namespace HardwareStore.WebClient.Controllers
 {
     public class ProfileController : Controller
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserRepository _userRepo;
 
-        public ProfileController(IUserRepository userRepository)
+        public ProfileController(IUserRepository userRepo)
         {
-            _userRepository = userRepository;
+            _userRepo = userRepo;
         }
 
-        //[Authorize]
+        [Authorize]
         public IActionResult Profile()
         {
             // Displays the user profile using claims from JWT/cookie.
@@ -44,7 +44,7 @@ namespace HardwareStore.WebClient.Controllers
             }
 
             var userName = User.Identity!.Name;
-            var user = await _userRepository.GetByUsernameAsync(userName!);
+            var user = await _userRepo.GetByUsernameAsync(userName!);
 
             if (user == null)
             {

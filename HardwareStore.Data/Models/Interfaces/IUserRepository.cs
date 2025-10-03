@@ -2,15 +2,9 @@
 
 namespace HardwareStore.Data.Models.Interfaces
 {
-    public interface IUserRepository
+    public interface IUserRepository : IBaseRepository<ApplicationUser>
     {
-        Task<IEnumerable<ApplicationUser>> GetAllAsync();
-        Task<ApplicationUser> GetByIdAsync(string id);
         Task<ApplicationUser> GetByUsernameAsync(string username);
         Task<ApplicationUser> GetByEmailAsync(string email);
-        Task AddAsync(ApplicationUser user);
-        Task UpdateAsync(ApplicationUser user);
-        Task DeleteAsync(ApplicationUser user);
-
     }
 }

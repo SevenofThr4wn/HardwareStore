@@ -11,12 +11,12 @@ namespace HardwareStore.WebClient.Services
     public class ProductService : IProductService
     {
         private readonly AppDbContext _context;
-        private readonly IProductRepository _productRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProductService(AppDbContext context, IProductRepository productRepository)
+        public ProductService(AppDbContext context, IUnitOfWork unitOfWork)
         {
             _context = context;
-            _productRepository = productRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public IQueryable<Product> GetProductsQuery()
@@ -45,14 +45,14 @@ namespace HardwareStore.WebClient.Services
                 CreatedDate = DateTime.UtcNow
             };
 
-            await _productRepository.AddAsync(product);
+            await _unitOfWork.Products.AddAsync(product);
             await _context.SaveChangesAsync();
             return product;
         }
 
         public async Task<Product?> UpdateProductAsync(ProductEditVM model)
         {
-            var product = await _productRepository.GetByIdAsync(model.Id);
+            var product = await _unitOfWork.Products.GetByIdAsync(model.Id);
             if (product == null) return null;
 
             product.Name = model.Name;
@@ -80,7 +80,7 @@ namespace HardwareStore.WebClient.Services
                 CreatedDate = DateTime.UtcNow
             };
 
-            await _productRepository.AddAsync(product);
+            await _unitOfWork.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
             return product;
@@ -88,11 +88,11 @@ namespace HardwareStore.WebClient.Services
 
         public async Task DeleteProductAsync(int productId)
         {
-            var product = await _productRepository.GetByIdAsync(productId);
+            var product = await _unitOfWork.Products.GetByIdAsync(productId);
             if (product == null)
                 throw new KeyNotFoundException("Product not found");
 
-            await _productRepository.DeleteAsync(product);
+            await _unitOfWork.Products.DeleteAsync(product);
             await _context.SaveChangesAsync();
         }
 

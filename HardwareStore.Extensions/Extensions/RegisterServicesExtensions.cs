@@ -12,28 +12,37 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HardwareStore.Extensions.Extensions
 {
+    /// <summary>
+    /// An extension class to configure the required repositories and services for the web interfaces
+    /// </summary>
     public static class RegisterServicesExtensions
     {
+        /// <summary>
+        /// An extension method that configures and adds the required services to the web client.
+        /// </summary>
+        /// <param name="services">An extension of the IServiceCollection interface.</param>
+        /// <param name="config">An extension of the IConfiguration interface.</param>
+        /// <returns>The IServiceCollection for chaining.</returns>
         public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration config)
         {
-            // Add Services to Web Client
             services.AddScoped<INotificationService, NotificationService>();
-
-            // Configure Keycloak options
             services.Configure<KeycloakOptions>(
                 config.GetSection("Keycloak"));
 
-            // Add SignalR
             services.AddSignalR();
 
             return services;
         }
 
+        /// <summary>
+        /// An extension method thar configures and adds the required repositories and unit of works to the web client.
+        /// </summary>
+        /// <param name="services">An extension of the IServiceCollection interface.</param>
+        /// <param name="config">An extension of the IConfiguration interface.</param>
+        /// <returns>The IServiceCollection for chaining.</returns>
         public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration config)
         {
-            // Add HttpClient factory first
             services.AddHttpClient();
-
 
             services.AddScoped<Keycloak.Net.KeycloakClient>(sp =>
             {
@@ -52,15 +61,13 @@ namespace HardwareStore.Extensions.Extensions
                 return keycloakClient;
             });
 
-            // Add Repositories to Web Client
-            services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped<KeycloakHelper>();
 
-            // Adds the Sync Service to the application
             services.AddScoped<KeyCloakSync>(sp =>
             {
                 var dbContext = sp.GetRequiredService<AppDbContext>();
@@ -77,7 +84,6 @@ namespace HardwareStore.Extensions.Extensions
                 return new KeyCloakSync(dbContext, httpClient, serverUrl, realm, adminUser, adminPassword);
             });
 
-            // Registers the hosted service to sync the users to the SQL database.
             services.AddHostedService<KeyCloakSyncService>();
             return services;
         }

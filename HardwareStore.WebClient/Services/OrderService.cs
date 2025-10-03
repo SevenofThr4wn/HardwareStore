@@ -144,7 +144,12 @@ namespace HardwareStore.WebClient.Services
 
         public async Task CancelOrderAsync(int orderId)
         {
-            await _orderRepository.DeleteAsync(orderId);
+            await _orderRepository.UpdateAsync(orderId, order =>
+            {
+                order.Status = OrderStatus.Cancelled;
+                order.UpdatedDate = DateTime.UtcNow;
+            });
+
             await _context.SaveChangesAsync();
         }
 

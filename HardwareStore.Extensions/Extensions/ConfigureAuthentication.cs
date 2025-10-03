@@ -12,36 +12,50 @@ using System.Text.Json;
 
 namespace HardwareStore.Extensions.Extensions
 {
+    /// <summary>
+    /// Provides extension methods to configure authentication and authorization
+    /// with Keycloak integration in an ASP.NET Core application.
+    /// </summary>
+    /// <remarks>
+    /// This class configures both cookie and JWT bearer authentication,
+    /// integrates Keycloak as the identity provider, sets up token validation,
+    /// and registers authorization policies. It also provides helper methods
+    /// to extract role claims from Keycloak JWTs and normalizes claims for
+    /// cookie-based authentication scenarios.
+    /// </remarks>
     public static class ConfigureAuthentication
     {
         /// <summary>
-        /// Configures authentication and authorization for Keycloak integration.
-        /// Sets up cookie and JWT bearer authentication, maps Keycloak claims to .NET claims,
-        /// and registers authorization policies and claims transformation.
+        /// Configures Keycloak-based authentication and authorization.
         /// </summary>
-        /// <param name="services">The service collection to add authentication services to.</param>
-        /// <param name="configuration">The application configuration containing Keycloak settings.</param>
-        /// <returns>The updated service collection.</returns>
-        /// <exception cref="InvalidOperationException">Thrown if Keycloak:Authority is not configured.</exception>
+        /// <param name="services">The service collection to register authentication and authorization services into.</param>
+        /// <param name="configuration">The application configuration, expected to contain Keycloak settings such as <c>Keycloak:Authority</c> and <c>Keycloak:ClientId</c>.</param>
+        /// <returns>The updated <see cref="IServiceCollection"/> with Keycloak authentication and authorization configured.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if <c>Keycloak:Authority</c> is missing or invalid in configuration.</exception>
+        /// <remarks>
+        /// This method:
+        /// <list type="bullet">
+        ///   <item><description>Registers cookie authentication as the default scheme.</description></item>
+        ///   <item><description>Configures JWT bearer authentication against a Keycloak authority.</description></item>
+        ///   <item><description>Defines custom audience validation logic to support Keycloak-specific tokens.</description></item>
+        ///   <item><description>Maps Keycloak claims (<c>preferred_username</c>, <c>realm_access</c>, <c>resource_access</c>) into .NET claims.</description></item>
+        ///   <item><description>Sets up authorization policies for authenticated users and role-based access control.</description></item>
+        ///   <item><description>Registers a custom claims transformer to normalize identities to the cookie authentication scheme.</description></item>
+        /// </list>
+        /// </remarks>
         public static IServiceCollection ConfigureKeycloakAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             // Reads the Keycloak server URL and client id from appsettings.json
             var authority = configuration["Keycloak:Authority"];
             var clientId = configuration["Keycloak:ClientId"];
 
-            // throws an error if Authority is missing in the json file.
             if (string.IsNullOrEmpty(authority))
                 throw new InvalidOperationException("Keycloak:Authority must be configured. Please see appsettings.json for more information");
 
-            // Ensures the authority URL ends with a / for proper URI concatentation.
             if (!authority.EndsWith("/")) authority += "/";
 
-            // Builds the well-known OpenID Connect configuration URL
-            // Example: https://keycloak.example.com/auth/realms/myrealm/.wel-known/openid-configuration
             var wellKnownUrl = new Uri(new Uri(authority), ".well-known/openid-configuration").AbsoluteUri;
 
-            // Creates a ConfigurationManager that fetches Keycloak's OpenID configuration dynamically.
-            // RequireHttps = false allows non-https connections
             var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
                 wellKnownUrl,
                 new OpenIdConnectConfigurationRetriever(),
@@ -188,12 +202,27 @@ namespace HardwareStore.Extensions.Extensions
         }
 
         /// <summary>
-        /// Adds role claims from a JSON claim in the JWT to the provided ClaimsIdentity.
-        /// Handles both "realm_access" and "resource_access" claim structures from Keycloak.
+        /// Adds role claims to a <see cref="ClaimsIdentity"/> from JSON claims within a Keycloak JWT.
         /// </summary>
-        /// <param name="identity">The ClaimsIdentity to add roles to.</param>
-        /// <param name="claimType">The claim type to extract roles from (e.g., "realm_access" or "resource_access").</param>
-        /// <param name="rolesProperty">The property name within the claim that contains the roles array, or null for "resource_access".</param>
+        /// <param name="identity">The <see cref="ClaimsIdentity"/> to which role claims will be added.</param>
+        /// <param name="claimType">
+        /// The claim type in the JWT that contains role information.
+        /// Typically <c>realm_access</c> for global roles or <c>resource_access</c> for client-specific roles.
+        /// </param>
+        /// <param name="rolesProperty">
+        /// The property name inside the claim that contains the roles array.
+        /// Pass <c>null</c> for <c>resource_access</c> claims, since they have nested role structures.
+        /// </param>
+        /// <remarks>
+        /// This method safely parses Keycloak’s role structures and adds them as <see cref="ClaimTypes.Role"/> claims
+        /// to the identity. It handles:
+        /// <list type="bullet">
+        ///   <item><description><c>realm_access.roles</c> JSON arrays.</description></item>
+        ///   <item><description><c>resource_access.{client}.roles</c> JSON arrays.</description></item>
+        ///   <item><description>Flat role arrays directly in a claim.</description></item>
+        /// </list>
+        /// If parsing fails, an error is logged to the console but execution continues without throwing.
+        /// </remarks>
         private static void AddRolesFromJsonClaim(ClaimsIdentity identity, string claimType, string? rolesProperty)
         {
             var claim = identity.FindFirst(claimType);
@@ -244,8 +273,35 @@ namespace HardwareStore.Extensions.Extensions
             }
         }
 
+
+        /// <summary>
+        /// A claims transformer that ensures authenticated users have their identity
+        /// represented with the cookie authentication scheme.
+        /// </summary>
+        /// <remarks>
+        /// This is useful when a user may authenticate using a different scheme (e.g., JWT, OAuth),
+        /// but the application expects claims to be associated with
+        /// <see cref="CookieAuthenticationDefaults.AuthenticationScheme"/> for consistency.
+        /// </remarks>
         public class ClaimsTransformer : IClaimsTransformation
         {
+            /// <summary>
+            /// Transforms the incoming <see cref="ClaimsPrincipal"/> to use the cookie authentication scheme.
+            /// </summary>
+            /// <param name="principal">The original <see cref="ClaimsPrincipal"/> from authentication middleware.</param>
+            /// <returns>
+            /// A <see cref="ClaimsPrincipal"/> with a <see cref="ClaimsIdentity"/> based on the cookie scheme,
+            /// or the original principal if no transformation is required.
+            /// </returns>
+            /// <remarks>
+            /// <para>
+            /// Transformation occurs only if the identity is authenticated but uses a scheme
+            /// other than <see cref="CookieAuthenticationDefaults.AuthenticationScheme"/>.
+            /// </para>
+            /// <para>
+            /// Claims, name claim type, and role claim type are preserved when creating the new identity.
+            /// </para>
+            /// </remarks>
             public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
             {
                 if (principal?.Identity is ClaimsIdentity identity && identity.IsAuthenticated)

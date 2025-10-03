@@ -12,16 +12,18 @@ namespace HardwareStore.WebClient.Controllers
     public class UsersController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly IUserRepository _userRepository;
+        private readonly IUserRepository _userRepo;
         private readonly IUserService _userService;
 
-        public UsersController(AppDbContext context,
-            IUserRepository userRepository,
+        public UsersController
+           (
+            AppDbContext context,
+            IUserRepository userRepo,
             IUserService userService)
         {
-            _userService = userService;
             _context = context;
-            _userRepository = userRepository;
+            _userService = userService;
+            _userRepo = userRepo;
         }
 
         [Authorize(Roles = "Admin,Manager")]
@@ -64,6 +66,7 @@ namespace HardwareStore.WebClient.Controllers
                 .SelectEditUsers()
                 .FirstOrDefaultAsync();
 
+            // Null Check: If ID is empty, return Not Found(404) response.
             if (user == null)
             {
                 return NotFound();
@@ -79,6 +82,7 @@ namespace HardwareStore.WebClient.Controllers
         [HttpPost]
         public async Task<IActionResult> EditUser(UserEditVM model)
         {
+            // Check: If the Model State is invalid, return Bad Request (400) response.
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -86,9 +90,9 @@ namespace HardwareStore.WebClient.Controllers
 
             // Finds the User ID in the system.
 
-            var user = await _userRepository.GetByIdAsync(model.Id);
+            var user = await _userRepo.GetByIdAsync(model.Id);
 
-            // If the ID is empty, then return Response Code 404(Not Found)
+            // Null Check: If ID is empty, return Not Found(404) response.
             if (user == null)
             {
                 return NotFound();
@@ -112,21 +116,21 @@ namespace HardwareStore.WebClient.Controllers
         {
 
             // Finds the user in the system by it's Id.
-            var user = await _userRepository.GetByIdAsync(id);
+            var user = await _userRepo.GetByIdAsync(id);
 
-            // If the Id is null, then return a response code 404(Not Found).
+            // Null Check: If ID is empty, return Not Found(404) response.
             if (user == null)
             {
                 return NotFound();
             }
 
-            // Prevent deleting own account
+            // Check: Prevents user from deleting their own account
             if (user.UserName == User.Identity!.Name)
             {
                 return BadRequest(new { success = false, message = "Cannot delete your own account" });
             }
 
-            await _userRepository.DeleteAsync(user);
+            await _userRepo.DeleteAsync(user);
             await _context.SaveChangesAsync();
 
             return Ok(new { success = true, message = "User deleted successfully" });

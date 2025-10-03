@@ -1,5 +1,4 @@
-﻿using HardwareStore.Data.Context;
-using HardwareStore.WebClient.Models;
+﻿using HardwareStore.WebClient.Models;
 using HardwareStore.WebClient.Services;
 using HardwareStore.WebClient.ViewModels.Dashboard;
 using Microsoft.AspNetCore.Authorization;
@@ -7,24 +6,30 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HardwareStore.WebClient.Controllers
 {
+    /// <summary>
+    /// Handles dashboard views for different user roles (Admin, Manager).
+    /// </summary>
     public class DashboardController : Controller
     {
-        private readonly AppDbContext _context;
         private readonly IUserService _userService;
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
 
-        public DashboardController(AppDbContext context,
+        public DashboardController(
             IUserService userService,
             IProductService productService,
             IOrderService orderService)
         {
-            _context = context;
             _userService = userService;
             _productService = productService;
             _orderService = orderService;
         }
 
+        /// <summary>
+        /// Displays the admin dashboard with system-wide statistics,
+        /// quick actions, and recent activity.
+        /// Accessible by Admins and Managers.
+        /// </summary>
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> AdminDashboard()
         {
@@ -42,28 +47,28 @@ namespace HardwareStore.WebClient.Controllers
                         Title = "Manage Users",
                         Description = "View and manage user accounts",
                         Icon = "bi bi-people-fill",
-                        Url = Url.Action("ManageUsers")!
+                        Url = "/Users/ManageUsers"
                     },
                     new QuickAction
                     {
                         Title = "Manage Products",
                         Description = "Add, edit, or remove products",
                         Icon = "bi bi-box-seam",
-                        Url = Url.Action("ManageProducts")!
+                        Url = "/Products/ManageProducts"
                     },
                     new QuickAction
                     {
                         Title = "Manage Orders",
                         Description = "Process and track orders",
                         Icon = "bi bi-cart-check",
-                        Url = Url.Action("ManageOrders")!
+                        Url = "/Orders/ManageOrders"
                     },
                     new QuickAction
                     {
                         Title = "Admin Settings",
                         Description = "System configuration",
                         Icon = "bi bi-gear-fill",
-                        Url = Url.Action("AdminSettings")!
+                        Url = "/Settings/AdminSettings"
                     }
                 },
 
@@ -72,10 +77,14 @@ namespace HardwareStore.WebClient.Controllers
             return View(dashboardData);
         }
 
+        /// <summary>
+        /// Displays the manager dashboard with product, stock, staff,
+        /// and order-related metrics.
+        /// Accessible by Admins and Managers.
+        /// </summary>
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> ManagerDashboard()
         {
-            // List of staff roles used to count the total staff members in the system
             var staffRoles = new[] { "Staff", "Admin", "Manager" };
 
             var dashboardData = new ManagerDashboardVM

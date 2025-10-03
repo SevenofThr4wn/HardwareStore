@@ -13,11 +13,22 @@ using System.Text.Json;
 
 namespace HardwareStore.WebClient.Controllers
 {
+
+    /// <summary>
+    /// Handles authentication and authorization flows for the application,
+    /// integrating with Keycloak for login, registration, and JWT validation.
+    /// </summary>
     public class AuthController : Controller
     {
         private readonly IConfiguration _config;
         private readonly HttpClient _httpClient;
 
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthController"/>.
+        /// </summary>
+        /// <param name="config">The application configuration containing Keycloak settings.</param>
+        /// <param name="httpClient">The HTTP client used to communicate with Keycloak endpoints.</param>
         public AuthController(IConfiguration config, HttpClient httpClient)
         {
             _config = config;
@@ -27,22 +38,24 @@ namespace HardwareStore.WebClient.Controllers
         /// <summary>
         /// Displays the login page.
         /// </summary>
-        /// <param name="returnUrl">The URL to redirect the user to after a successful login (defaults to "/").</param>
+        /// <param name="returnUrl">The URL to redirect the user to after successful login.</param>
         /// <returns>The login view.</returns>
         [AllowAnonymous]
         public IActionResult Login(string returnUrl = "/")
         {
-            // Stores URL to redirect after a successful login.
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         /// <summary>
-        /// Handles login requests and signs in the user if credentials are valid.
+        /// Handles login form submission, validates user credentials against Keycloak,
+        /// creates a claims principal, and issues an authentication cookie.
         /// </summary>
-        /// <param name="model">The login form data.</param>
-        /// <param name="returnUrl">The URL to redirect to after a successful login.</param>
-        /// <returns>The login view with errors, or a redirect on success.</returns>
+        /// <param name="model">The login view model containing username, password, and remember-me flag.</param>
+        /// <param name="returnUrl">The URL to redirect the user to upon successful login.</param>
+        /// <returns>
+        /// A redirect to the requested resource on success, or the login view with error messages on failure.
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -55,18 +68,15 @@ namespace HardwareStore.WebClient.Controllers
 
             try
             {
-                // Calls Keycloak to get an access token using username/password.
                 var token = await GetKeycloakTokenAsync(model.Username, model.Password);
 
-                // Called when an invalid login occurrs.
                 if (token == null)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid username or password");
                     return View(model);
                 }
 
-                // Validates JWT, extracts claims(roles, username, email).
-                // Creates ClaimsIdentity and signs in the user using cookies.
+
                 var claims = await ValidateJwtAndExtractClaims(token);
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
@@ -79,14 +89,12 @@ namespace HardwareStore.WebClient.Controllers
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
 
-                // Debuging Purposes => Remove when needed.
                 var userRoles = claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
                 Console.WriteLine($"User {model.Username} logged in with roles: {string.Join(", ", userRoles)}");
 
                 return LocalRedirect(returnUrl);
             }
 
-            // Handles failed login attempts.
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, $"Login failed: {ex.Message}");
@@ -102,10 +110,12 @@ namespace HardwareStore.WebClient.Controllers
         public IActionResult Register() => View();
 
         /// <summary>
-        /// Handles registration requests and creates a new user.
+        /// Handles user registration by creating a new account in Keycloak.
         /// </summary>
-        /// <param name="viewModel">The registration form data.</param>
-        /// <returns>The registration view with errors, or a redirect on success.</returns>
+        /// <param name="viewModel">The registration view model containing user details.</param>
+        /// <returns>
+        /// Redirects to the login page if registration succeeds, otherwise redisplays the registration view with errors.
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -128,15 +138,22 @@ namespace HardwareStore.WebClient.Controllers
             }
         }
 
+        /// <summary>
+        /// Logs the current user out by clearing their authentication cookie.
+        /// </summary>
+        /// <returns>A redirect to the home page.</returns>
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            // Clears the cookie when user signs out.
-            // Requires authentication to access(i.e. if you are logged in).
+
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
 
+        /// <summary>
+        /// Displays the Access Denied page when a user attempts to access a forbidden resource.
+        /// </summary>
+        /// <returns>The AccessDenied view.</returns>
         [AllowAnonymous]
         public IActionResult AccessDenied()
         {
@@ -146,11 +163,12 @@ namespace HardwareStore.WebClient.Controllers
         #region Authentication / Authorization Methods
 
         /// <summary>
-        /// Validates a JWT token and extracts claims, including Keycloak realm and resource roles.
+        /// Validates a JWT access token against Keycloak's OpenID configuration and extracts user claims,
+        /// including roles from <c>realm_access</c> and <c>resource_access</c>.
         /// </summary>
-        /// <param name="token">The JWT access token to validate and extract claims from.</param>
+        /// <param name="token">The JWT access token to validate.</param>
         /// <returns>A list of claims extracted from the validated token.</returns>
-        /// <exception cref="InvalidOperationException">Thrown if Keycloak authority is not configured.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the Keycloak authority is not configured.</exception>
         private async Task<List<Claim>> ValidateJwtAndExtractClaims(string token)
         {
             var authority = _config["Keycloak:Authority"];
@@ -208,11 +226,9 @@ namespace HardwareStore.WebClient.Controllers
 
             if (principal.Identity is ClaimsIdentity identity)
             {
-                // Remove existing role claims to avoid duplicates
                 var existingRoles = identity.FindAll(ClaimTypes.Role).ToList();
                 foreach (var r in existingRoles) identity.RemoveClaim(r);
 
-                // Extract realm_access roles
                 var realmClaim = claims.FirstOrDefault(c => c.Type == "realm_access");
                 if (realmClaim != null)
                 {
@@ -231,7 +247,6 @@ namespace HardwareStore.WebClient.Controllers
                     catch { }
                 }
 
-                // Extract resource_access roles
                 var resourceClaim = claims.FirstOrDefault(c => c.Type == "resource_access");
                 if (resourceClaim != null)
                 {
@@ -261,12 +276,12 @@ namespace HardwareStore.WebClient.Controllers
         }
 
         /// <summary>
-        /// Requests an access token from Keycloak using the Resource Owner Password Credentials grant.
+        /// Requests a user access token from Keycloak using the Resource Owner Password Credentials (ROPC) flow.
         /// </summary>
-        /// <param name="username">The username of the user attempting to log in.</param>
-        /// <param name="password">The password of the user attempting to log in.</param>
+        /// <param name="username">The username of the Keycloak user.</param>
+        /// <param name="password">The user's password.</param>
         /// <returns>
-        /// A JWT access token as a string if authentication is successful; otherwise, <c>null</c>.
+        /// The access token string if the request is successful; otherwise <c>null</c>.
         /// </returns>
         private async Task<string?> GetKeycloakTokenAsync(string username, string password)
         {
@@ -290,10 +305,9 @@ namespace HardwareStore.WebClient.Controllers
         }
 
         /// <summary>
-        /// Gets an admin access token from Keycloak using the admin credentials configured in app settings.
-        /// Used for administrative operations such as user creation.
+        /// Requests an admin access token from Keycloak for use with administrative API calls.
         /// </summary>
-        /// <returns>The admin JWT access token as a string.</returns>
+        /// <returns>The admin access token string.</returns>
         private async Task<string> GetAdminTokenAsync()
         {
             var keycloakUrl = _config["Keycloak:ServerUrl"];
@@ -316,10 +330,10 @@ namespace HardwareStore.WebClient.Controllers
         }
 
         /// <summary>
-        /// Creates a new user in Keycloak using the provided registration view model.
+        /// Creates a new user in Keycloak using the admin API.
         /// </summary>
-        /// <param name="viewModel">The registration data for the new user.</param>
-        /// <returns>True if the user was created successfully; otherwise, false.</returns>
+        /// <param name="viewModel">The registration view model containing user details.</param>
+        /// <returns><c>true</c> if the user was successfully created; otherwise <c>false</c>.</returns>
         private async Task<bool> CreateKeycloakUserAsync(RegisterViewModel viewModel)
         {
             var token = await GetAdminTokenAsync();

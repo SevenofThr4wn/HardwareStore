@@ -2,6 +2,7 @@
 using HardwareStore.Core.Models;
 using HardwareStore.Data.Context;
 using HardwareStore.Data.Models.Interfaces;
+using HardwareStore.Services.Interfaces;
 using HardwareStore.WebClient.Services;
 using HardwareStore.WebClient.ViewModels.Orders.Create;
 using Microsoft.AspNetCore.Authorization;
@@ -11,19 +12,23 @@ using System.Security.Claims;
 
 namespace HardwareStore.WebClient.Controllers
 {
-    public class OrderController : Controller
+    public class OrdersController : Controller
     {
         private readonly AppDbContext _context;
         private readonly IOrderService _orderService;
-        private readonly IOrderRepository _orderRepository;
+        private readonly IOrderRepository _orderRepo;
+        private readonly INotificationService _notificationService;
 
-        public OrderController(IOrderRepository orderRepository,
+        public OrdersController(
+            IOrderRepository orderRepo,
             IOrderService orderService,
+            INotificationService notificationService,
             AppDbContext context)
         {
-            _context = context;
+            _orderRepo = orderRepo;
             _orderService = orderService;
-            _orderRepository = orderRepository;
+            _notificationService = notificationService;
+            _context = context;
         }
 
         [HttpPost]
@@ -54,6 +59,9 @@ namespace HardwareStore.WebClient.Controllers
                 }
             }
 
+            var user = await _context.Users.FindAsync(model.UserId);
+            var userName = user?.UserName ?? "Unknown User";
+
             var order = new Order
             {
                 UserId = model.UserId,
@@ -67,16 +75,32 @@ namespace HardwareStore.WebClient.Controllers
                     UnitPrice = products.First(p => p.ProductId == i.ProductId).Price,
                 }).ToList()
             };
-            await _orderRepository.AddAsync(order);
+            await _orderRepo.AddAsync(order);
 
             // Deduct Stock
             foreach (var item in model.Items)
             {
                 var product = products.First(p => p.ProductId == item.ProductId);
                 product.StockQuantity -= item.Quantity;
+
+                if (product.StockQuantity <= 10) 
+                {
+                    await _notificationService.NotifyLowStock(
+                        product.ProductId,
+                        product.Name,
+                        product.StockQuantity
+                    );
+                }
             }
 
             await _context.SaveChangesAsync();
+
+            await _notificationService.NotifyNewOrder(
+                order.Id,
+                order.OrderNo,
+                userName,
+                order.TotalAmount
+            );
 
             return Ok(new { success = true, message = "Order Sucessfully Created!", orderId = order.Id });
         }
@@ -100,12 +124,31 @@ namespace HardwareStore.WebClient.Controllers
         {
             try
             {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var currentUser = User.Identity?.Name ?? "System";
+
+                var order = await _orderService.GetOrderDetailsAsync(id, userId!);
+                if (order == null)
+                    return NotFound();
+
+                var oldStatus = order.Status.ToString();
+
                 await _orderService.CancelOrderAsync(id);
+
+                await _notificationService.NotifyOrderUpdateStatus(
+                    id,
+                    order.OrderNumber,
+                    oldStatus,
+                    "Cancelled",
+                    currentUser
+                );
+
                 return RedirectToAction(nameof(MyOrders));
             }
             catch
             {
-                var order = await _orderService.GetOrderDetailsAsync(id, User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var order = await _orderService.GetOrderDetailsAsync(id, userId!);
                 return View(order);
             }
         }
@@ -131,6 +174,8 @@ namespace HardwareStore.WebClient.Controllers
             if (orderDetails == null)
                 return NotFound();
 
+            ViewBag.OrderId = id;
+
             return View(orderDetails);
         }
 
@@ -146,14 +191,30 @@ namespace HardwareStore.WebClient.Controllers
             return View(orders);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> UpdateOrderStatus(int orderId, string status)
         {
             if (!Enum.TryParse<OrderStatus>(status, out var parsedStatus))
                 return BadRequest("Invalid order status");
 
+            // Get current order status before update
+            var currentOrder = await _orderRepo.GetByIdAsync(orderId);
+            if (currentOrder == null)
+                return NotFound();
+
+            var oldStatus = currentOrder.Status.ToString();
+            var currentUser = User.Identity?.Name ?? "System";
+
             await _orderService.UpdateOrderStatusAsync(orderId, parsedStatus);
+
+            await _notificationService.NotifyOrderUpdateStatus(
+                orderId,
+                currentOrder.OrderNo,
+                oldStatus,
+                parsedStatus.ToString(),
+                currentUser
+            );
 
             return Ok(new { success = true, message = $"Order status updated to {parsedStatus}" });
         }

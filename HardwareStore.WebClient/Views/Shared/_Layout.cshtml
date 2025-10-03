@@ -8,7 +8,6 @@
     <title>@ViewData["Title"] - HardwareStore.WebClient</title>
     <script type="importmap"></script>
 
-    <!-- Imports bootstrap and bootstrap icons-->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HardwareStore.WebClient.styles.css" asp-append-version="true" />
@@ -35,34 +34,23 @@
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Profile">Profile</a>
+                                <a class="nav-link text-dark" asp-controller="Profile" asp-action="Profile">Profile</a>
                             </li>
-
-                            <!--Orders Link-->
+  
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Order" asp-action="Index">Orders</a>
-                            </li>
-
-                            <!--Product Link-->
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Product" asp-action="Index">Product</a>
-                            </li>
-
-                    
-                            <li class="nav-item">
-                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-link nav-link">Logout</button>
+                                <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="nav-link text-dark">Logout</button>
                                 </form>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
+                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Login</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register</a>
+                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Register</a>
                             </li>
                         }
                     </ul>
@@ -75,16 +63,9 @@
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - HardwareStore.WebClient - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
 </html>

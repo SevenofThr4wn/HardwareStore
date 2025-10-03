@@ -1,6 +1,5 @@
 ﻿using HardwareStore.Core.Models;
 using HardwareStore.Data.Context;
-using HardwareStore.Data.Models.Interfaces;
 using HardwareStore.WebClient.Services;
 using HardwareStore.WebClient.Services.Extensions;
 using HardwareStore.WebClient.ViewModels.Product.Create;
@@ -16,22 +15,18 @@ namespace HardwareStore.WebClient.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IProductService _productService;
-        private readonly IProductRepository _productRepository;
 
         public ProductsController(AppDbContext context,
-            IProductRepository productRepository,
             IProductService productService)
         {
             _context = context;
             _productService = productService;
-            _productRepository = productRepository;
         }
 
         // GET: Create Product page
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> CreateProduct()
         {
-            // Get existing categories for dropdown
             var categories = await _context.Products
                 .Where(p => !string.IsNullOrEmpty(p.Category))
                 .Select(p => p.Category)
@@ -44,8 +39,8 @@ namespace HardwareStore.WebClient.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> CreateProduct(ProductCreateVM model)
         {
             if (!ModelState.IsValid)
@@ -58,7 +53,7 @@ namespace HardwareStore.WebClient.Controllers
             {
                 var product = await _productService.CreateProductAsync(model);
                 TempData["SuccessMessage"] = $"Product '{product.Name}' created successfully!";
-                return RedirectToAction("ManageProducts", "Account");
+                return RedirectToAction("ManageProducts", "Products");
             }
             catch (Exception ex)
             {
@@ -88,8 +83,8 @@ namespace HardwareStore.WebClient.Controllers
             return View(products);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> GetProduct(int id)
         {
             var product = await _productService.GetProductsQuery()
@@ -103,8 +98,8 @@ namespace HardwareStore.WebClient.Controllers
             return Ok(product);
         }
 
-        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> SaveProduct(ProductEditVM model)
         {
             if (!ModelState.IsValid)
@@ -126,8 +121,8 @@ namespace HardwareStore.WebClient.Controllers
         }
 
 
-        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             try

@@ -1,14 +1,14 @@
-﻿using HardwareStore.Services.Interfaces;
-using HardwareStore.WebClient.Hubs;
+﻿using HardwareStore.Services.Hubs;
+using HardwareStore.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 
 namespace HardwareStore.WebClient.Services
 {
     public class NotificationPublisher : INotificationPublisher
     {
-        private readonly IHubContext<NotifHub> _hubContext;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public NotificationPublisher(IHubContext<NotifHub> hubContext)
+        public NotificationPublisher(IHubContext<NotificationHub> hubContext)
         {
             _hubContext = hubContext;
         }

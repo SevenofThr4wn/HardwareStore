@@ -1,6 +1,6 @@
 using HardwareStore.Extensions.Extensions;
+using HardwareStore.Services.Hubs;
 using HardwareStore.Services.Interfaces;
-using HardwareStore.WebClient.Hubs;
 using HardwareStore.WebClient.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,8 +11,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 
-// Notification Publisher
+// Services
 builder.Services.AddScoped<INotificationPublisher, NotificationPublisher>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 // Identity
 builder.Services.AddIdentityConfig();
@@ -44,6 +47,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-app.MapHub<NotifHub>("/notifications");
+app.MapHub<NotificationHub>("/notifications");
 
 app.Run();

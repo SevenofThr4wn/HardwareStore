@@ -2,12 +2,9 @@
 
 namespace HardwareStore.Data.Models.Interfaces
 {
-    public interface INotificationRepository
+    public interface INotificationRepository : IBaseRepository<Notification>
     {
-        Task<IEnumerable<Notification>> GetAllAsync();
         Task<IEnumerable<Notification>> GetByUserIdAsync(string id);
-        Task AddAsync(Notification notification);
-        Task UpdateAsync(Notification notification);
-        Task DeleteAsync(Notification notification);
+
     }
 }
