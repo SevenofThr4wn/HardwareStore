@@ -9,6 +9,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HardwareStore.WebClient.Services
 {
+
+    /// <summary>
+    /// Provides order-related operations for the web client, including retrieval,
+    /// updating status, cancellation, and dashboard metrics.
+    /// </summary>
     public class OrderService : IOrderService
     {
         private readonly AppDbContext _context;
@@ -20,6 +25,9 @@ namespace HardwareStore.WebClient.Services
             _orderRepository = orderRepository;
         }
 
+        /// <summary>
+        /// Returns a queryable collection of orders including related users and products.
+        /// </summary>
         public IQueryable<Order> GetOrdersQuery()
         {
             return _context.Orders
@@ -29,6 +37,13 @@ namespace HardwareStore.WebClient.Services
                 .AsQueryable();
         }
 
+        /// <summary>
+        /// Retrieves a list of orders for management purposes with optional status and date filters.
+        /// Maps orders to <see cref="OrderManageVM"/> for dashboard or admin views.
+        /// </summary>
+        /// <param name="statusFilter">Optional status filter as string. Use "All" to include all orders.</param>
+        /// <param name="dateFilter">Optional date filter to select orders by order date.</param>
+        /// <returns>A list of <see cref="OrderManageVM"/> representing the filtered orders.</returns>
         public async Task<List<OrderManageVM>> GetOrdersAsync(string? statusFilter = null, DateTime? dateFilter = null)
         {
             var query = GetOrdersQuery();
@@ -61,6 +76,12 @@ namespace HardwareStore.WebClient.Services
                 }).ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves all orders for a specific user, optionally filtered by order status.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose orders should be retrieved.</param>
+        /// <param name="statusFilter">Optional <see cref="OrderStatus"/> filter.</param>
+        /// <returns>A list of <see cref="OrderViewModel"/> representing the user's orders.</returns>
         public async Task<List<OrderViewModel>> GetUserOrdersAsync(string userId, OrderStatus? statusFilter = null)
         {
             var query = _context.Orders
@@ -89,6 +110,12 @@ namespace HardwareStore.WebClient.Services
                 }).ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves detailed information for a specific order, including order items and user info.
+        /// </summary>
+        /// <param name="orderId">The ID of the order.</param>
+        /// <param name="userId">The ID of the user who owns the order.</param>
+        /// <returns>An <see cref="OrderDetailsViewModel"/> with full order details, or <c>null</c> if the order is not found.</returns>
         public async Task<OrderDetailsViewModel?> GetOrderDetailsAsync(int orderId, string userId)
         {
             var order = await _context.Orders
@@ -131,6 +158,12 @@ namespace HardwareStore.WebClient.Services
             };
         }
 
+        /// <summary>
+        /// Updates the status of a specific order.
+        /// </summary>
+        /// <param name="orderId">The ID of the order to update.</param>
+        /// <param name="status">The new <see cref="OrderStatus"/> to apply.</param>
+        /// <exception cref="KeyNotFoundException">Thrown if the order is not found.</exception>
         public async Task UpdateOrderStatusAsync(int orderId, OrderStatus status)
         {
             var order = await _orderRepository.GetByIdAsync(orderId);
@@ -142,6 +175,10 @@ namespace HardwareStore.WebClient.Services
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Cancels a specific order and updates the modification date.
+        /// </summary>
+        /// <param name="orderId">The ID of the order to cancel.</param>
         public async Task CancelOrderAsync(int orderId)
         {
             await _orderRepository.UpdateAsync(orderId, order =>
@@ -153,11 +190,17 @@ namespace HardwareStore.WebClient.Services
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Returns the total number of orders created today.
+        /// </summary>
         public async Task<int> GetTodaysOrders()
         {
             return await _context.Orders.CountAsync(o => o.OrderDate.Date == DateTime.Today);
         }
 
+        /// <summary>
+        /// Returns the total revenue generated from orders today.
+        /// </summary>
         public async Task<decimal> GetTotalRevenue()
         {
             return await _context.Orders
@@ -165,12 +208,20 @@ namespace HardwareStore.WebClient.Services
                     .SumAsync(o => (int)o.TotalAmount);
         }
 
+        /// <summary>
+        /// Returns the count of orders that are currently pending.
+        /// </summary>
         public async Task<int> GetPendingOrdersCount()
         {
             return await _context.Orders
                 .CountAsync(o => o.Status == OrderStatus.Pending);
         }
 
+        /// <summary>
+        /// Retrieves a list of recent activities from the activity log, ordered by timestamp descending.
+        /// </summary>
+        /// <param name="take">The maximum number of recent activities to retrieve.</param>
+        /// <returns>A list of <see cref="ActivityLog"/> representing recent system activities.</returns>
         public async Task<List<ActivityLog>> GetRecentActivities(int take = 5)
         {
             return await _context.ActivityLogs

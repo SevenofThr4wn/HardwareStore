@@ -101,6 +101,7 @@ namespace HardwareStore.WebClient.Services
             return await _context.Products.CountAsync();
         }
 
+        
         public async Task<int> GetLowStockCount(int threshold = 10)
         {
             return await _context.Products.CountAsync(p => p.StockQuantity < threshold);

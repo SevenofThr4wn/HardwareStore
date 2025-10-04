@@ -1,6 +1,5 @@
 using HardwareStore.Extensions.Extensions;
 using HardwareStore.Services.Hubs;
-using HardwareStore.Services.Interfaces;
 using HardwareStore.WebClient.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +11,6 @@ builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 
 // Services
-builder.Services.AddScoped<INotificationPublisher, NotificationPublisher>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
