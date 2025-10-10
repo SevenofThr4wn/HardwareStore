@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace HardwareStore.WebClient.Controllers
 {
     /// <summary>
-    /// Handles dashboard views for different user roles (Admin, Manager).
+    /// Handles dashboard rendering and logic for administrative and managerial users.
+    /// Provides access to system-wide statistics, metrics, and quick actions.
     /// </summary>
     public class DashboardController : Controller
     {
@@ -15,6 +16,12 @@ namespace HardwareStore.WebClient.Controllers
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DashboardController"/> class.
+        /// </summary>
+        /// <param name="userService">The service responsible for user data retrieval.</param>
+        /// <param name="productService">The service responsible for product data retrieval.</param>
+        /// <param name="orderService">The service responsible for order data retrieval and statistics.</param>
         public DashboardController(
             IUserService userService,
             IProductService productService,
@@ -26,10 +33,15 @@ namespace HardwareStore.WebClient.Controllers
         }
 
         /// <summary>
-        /// Displays the admin dashboard with system-wide statistics,
-        /// quick actions, and recent activity.
-        /// Accessible by Admins and Managers.
+        /// Displays the Admin Dashboard containing global statistics, 
+        /// quick access links, and recent activity logs.
         /// </summary>
+        /// <remarks>
+        /// This action is accessible only to users with the <c>Admin</c> or <c>Manager</c> roles.
+        /// </remarks>
+        /// <returns>
+        /// A view populated with an <see cref="AdminDashboardVM"/> instance containing dashboard data.
+        /// </returns>
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> AdminDashboard()
         {
@@ -78,10 +90,16 @@ namespace HardwareStore.WebClient.Controllers
         }
 
         /// <summary>
-        /// Displays the manager dashboard with product, stock, staff,
-        /// and order-related metrics.
-        /// Accessible by Admins and Managers.
+        /// Displays the Manager Dashboard containing staff, product, and order-related insights.
         /// </summary>
+        /// <remarks>
+        /// This action provides key operational metrics such as stock levels, 
+        /// pending orders, and staff counts. Accessible by users with 
+        /// <c>Admin</c> or <c>Manager</c> roles.
+        /// </remarks>
+        /// <returns>
+        /// A view populated with a <see cref="ManagerDashboardVM"/> instance containing managerial data.
+        /// </returns>
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> ManagerDashboard()
         {

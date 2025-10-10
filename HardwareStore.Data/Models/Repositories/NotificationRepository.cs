@@ -5,22 +5,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HardwareStore.Data.Models.Repositories
 {
-    public class NotificationRepository : BaseRepository<Notification>, INotificationRepository
+    /// <summary>
+    /// Initalizes a new instance of the <see cref="NotificationRepository"/> class.
+    /// </summary>
+    /// <param name="context">The database context to use.</param>
+    public class NotificationRepository(AppDbContext context) : BaseRepository<Notification>(context), INotificationRepository
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _context = context;
 
-        public NotificationRepository(AppDbContext context) : base(context)
+        /// <summary>
+        /// Retrieves notifications for a specific user, ordered by most recent first.
+        /// </summary>
+        /// <param name="id">The user ID to retrieve notifications for.</param>
+        /// <returns>A list of notifications for the user.</returns>
+        public Task<List<Notification>> GetByUserIdAsync(string id)
         {
-            _context = context;
-        }
-
-        public async Task<IEnumerable<Notification>> GetByUserIdAsync(string id)
-        {
-            var notification = await _context.Notifications
-                            .Where(n => n.UserId == id)
-                            .OrderByDescending(n => n.CreatedAt)
-                            .ToListAsync();
-            return notification;
+            return _context.Notifications
+                           .AsNoTracking()
+                           .Where(n => n.UserId == id)
+                           .OrderByDescending(n => n.CreatedAt)
+                           .ToListAsync();
         }
     }
 }

@@ -3,354 +3,56 @@
     ViewData["Title"] = "Login";
     Layout = "_Layout";
 }
-<head>
-    <style>
-        /* Fix navigation bar spacing */
-        .navbar {
-            margin-bottom: 0 !important;
-        }
 
-        /* Main content spacing */
-        .main-content {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding-top: 0;
-            margin-top: 0;
-        }
+<div class="min-h-screen flex items-center justify-center bg-gray-100 pt-20">
+    <div class="max-w-lg w-full p-6">
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-lg p-8 animate-fadeIn">
 
-        /* Base styles */
-        body {
-            background-color: #f5f5f7;
-            color: #1d1d1f;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 16px;
-            margin: 0;
-            padding: 0;
-        }
+            <!-- Header -->
+            <div class="text-center mb-6">
+                <i class="bi bi-person-circle text-5xl text-blue-600 mb-3"></i>
+                <h1 class="text-2xl font-semibold text-gray-900 mb-1">Welcome Back</h1>
+                <p class="text-gray-500 text-base">Sign in to your Hardware Store account</p>
+            </div>
 
-        .login-container {
-            max-width: 730px;
-            width: 100%;
-            padding: 2rem;
-            margin-top: 2rem;
-        }
+            <!-- Validation Summary -->
+            <div asp-validation-summary="ModelOnly" class="bg-red-500 text-white p-4 rounded-md mb-4 text-sm"></div>
 
-        /* Login Card */
-        .login-card {
-            border-radius: 20px;
-            background: #fff;
-            border: 1px solid #e5e5e7;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-            padding: 2.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-top: 1rem;
-        }
+            <!-- Login Form -->
+            <form asp-action="Login" method="post">
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
 
-            .login-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 20px 48px rgba(0,0,0,0.16);
-            }
-
-        /* Header */
-        .login-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .login-icon {
-            font-size: 3.5rem;
-            color: #0071e3;
-            margin-bottom: 1rem;
-        }
-
-        .login-title {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #1d1d1f;
-            margin-bottom: 0.5rem;
-        }
-
-        .login-subtitle {
-            color: #86868b;
-            font-size: 1.1rem;
-            line-height: 1.4;
-        }
-
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            font-weight: 500;
-            color: #1d1d1f;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-            display: block;
-        }
-
-        .form-control {
-            border-radius: 12px;
-            border: 2px solid #e5e5e7;
-            padding: 1rem;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            height: 50px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-            .form-control:focus {
-                border-color: #0071e3;
-                box-shadow: 0 0 0 3px rgba(0,113,227,0.1);
-                outline: none;
-            }
-
-        .form-check {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .form-check-input {
-            width: 1.2em;
-            height: 1.2em;
-            border-radius: 4px;
-            border: 2px solid #e5e5e7;
-            margin: 0;
-        }
-
-            .form-check-input:checked {
-                background-color: #0071e3;
-                border-color: #0071e3;
-            }
-
-        .form-check-label {
-            color: #86868b;
-            font-size: 1rem;
-            margin: 0;
-        }
-
-        /* Buttons */
-        .btn-login {
-            background-color: #0071e3;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.3s ease;
-            height: 50px;
-            cursor: pointer;
-        }
-
-            .btn-login:hover {
-                background-color: #0062c4;
-                transform: translateY(-1px);
-            }
-
-            .btn-login:active {
-                transform: translateY(0);
-            }
-
-        /* Links */
-        .login-links {
-            text-align: center;
-            margin-top: 2rem;
-        }
-
-        .forgot-password {
-            color: #0071e3;
-            text-decoration: none;
-            font-size: 1rem;
-            display: block;
-            margin-bottom: 1rem;
-        }
-
-            .forgot-password:hover {
-                text-decoration: underline;
-            }
-
-        .register-link {
-            color: #86868b;
-            margin-top: 1rem;
-            font-size: 1rem;
-        }
-
-            .register-link a {
-                color: #0071e3;
-                text-decoration: none;
-                font-weight: 500;
-            }
-
-                .register-link a:hover {
-                    text-decoration: underline;
-                }
-
-        /* Validation */
-        .text-danger {
-            color: #ff3b30;
-            font-size: 0.9rem;
-            margin-top: 0.25rem;
-            display: block;
-        }
-
-        .validation-summary-errors {
-            background-color: #ff3b30;
-            color: white;
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-        }
-
-            .validation-summary-errors ul {
-                margin: 0;
-                padding-left: 1rem;
-            }
-
-        /* Responsive */
-        @@media (max-width: 768px) {
-            .login-container {
-                padding: 1rem;
-                margin-top: 1rem;
-            }
-
-            .login-card {
-                padding: 2rem;
-                margin-top: 0.5rem;
-            }
-
-            .login-title {
-                font-size: 1.75rem;
-            }
-
-            .login-icon {
-                font-size: 3rem;
-            }
-
-            .main-content {
-                padding: 0;
-            }
-        }
-
-        @@media (max-width: 480px) {
-            .login-card {
-                padding: 1.5rem;
-                margin: 0.5rem;
-            }
-
-            .login-title {
-                font-size: 1.5rem;
-            }
-
-            .login-icon {
-                font-size: 2.5rem;
-            }
-
-            .login-container {
-                padding: 0.5rem;
-            }
-        }
-
-        /* Ensure content is below navbar */
-        .navbar-fixed-top {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-
-        .main-content {
-            padding-top: 80px; /* Height of your navbar */
-        }
-
-        /* Animation */
-        @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .login-card {
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        /* Accessibility */
-        @@media (prefers-reduced-motion: reduce) {
-            .login-card, .btn-login {
-                transition: none;
-                transform: none !important;
-            }
-
-            .login-card {
-                animation: none;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Main Content Area -->
-    <div class="main-content">
-        <div class="login-container">
-            <div class="login-card">
-                <!-- Header -->
-                <div class="login-header">
-                    <i class="bi bi-person-circle login-icon"></i>
-                    <h1 class="login-title">Welcome Back</h1>
-                    <p class="login-subtitle">Sign in to your Hardware Store account</p>
+                <div class="mb-4">
+                    <label asp-for="Username" class="block text-gray-900 font-medium mb-1">Username</label>
+                    <input asp-for="Username" class="w-full h-12 px-4 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-200 transition-all" placeholder="Enter your username" />
+                    <span asp-validation-for="Username" class="text-red-500 text-sm mt-1 block"></span>
                 </div>
 
-                <!-- Validation Summary -->
-                <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
-
-                <!-- Login Form -->
-                <form asp-action="Login" method="post">
-                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
-
-                    <div class="form-group">
-                        <label asp-for="Username" class="form-label">Username</label>
-                        <input asp-for="Username" class="form-control" placeholder="Enter your username" />
-                        <span asp-validation-for="Username" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="Password" class="form-label">Password</label>
-                        <input asp-for="Password" class="form-control" placeholder="Enter your password" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="form-check">
-                            <input asp-for="RememberMe" class="form-check-input" />
-                            <label asp-for="RememberMe" class="form-check-label">Remember me</label>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-login">Sign In</button>
-                </form>
-
-                <!-- Links -->
-                <div class="login-links">
-                    <a href="#" class="forgot-password">Forgot password?</a>
-                    <div class="register-link">
-                        Don't have an account? <a asp-action="Register">Create one</a>
-                    </div>
+                <div class="mb-4">
+                    <label asp-for="Password" class="block text-gray-900 font-medium mb-1">Password</label>
+                    <input asp-for="Password" type="password" class="w-full h-12 px-4 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-200 transition-all" placeholder="Enter your password" />
+                    <span asp-validation-for="Password" class="text-red-500 text-sm mt-1 block"></span>
                 </div>
+
+                <div class="mb-4 flex items-center gap-2">
+                    <input asp-for="RememberMe" type="checkbox" class="w-5 h-5 text-blue-600 border-gray-300 rounded" />
+                    <label asp-for="RememberMe" class="text-gray-500 text-sm">Remember me</label>
+                </div>
+
+                <button type="submit" class="w-full h-12 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all">Sign In</button>
+            </form>
+
+            <!-- Links -->
+            <div class="text-center mt-6">
+                <a href="#" class="text-blue-600 hover:underline text-sm block mb-2">Forgot password?</a>
+                <p class="text-gray-500 text-sm">
+                    Don't have an account?
+                    <a asp-action="Register" class="text-blue-600 font-medium hover:underline">Create one</a>
+                </p>
             </div>
         </div>
     </div>
-</body>
+</div>
 
 @section Scripts {
     @{
@@ -358,25 +60,12 @@
     }
 
     <script>
-        // Add subtle hover effects
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputs = document.querySelectorAll('.form-control');
-            inputs.forEach(input => {
-                input.addEventListener('focus', () => {
-                    input.parentElement.style.transform = 'translateY(-2px)';
-                });
-                input.addEventListener('blur', () => {
-                    input.parentElement.style.transform = 'translateY(0)';
-                });
-            });
-
-            // Ensure proper spacing with navbar
+        document.addEventListener('DOMContentLoaded', () => {
+            // Adjust top padding if navbar exists
             const navbar = document.querySelector('.navbar');
-            const mainContent = document.querySelector('.main-content');
-
+            const mainContent = document.querySelector('body > div');
             if (navbar && mainContent) {
-                const navbarHeight = navbar.offsetHeight;
-                mainContent.style.paddingTop = navbarHeight + 'px';
+                mainContent.style.paddingTop = navbar.offsetHeight + 'px';
             }
         });
     </script>

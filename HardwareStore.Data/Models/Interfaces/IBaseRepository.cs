@@ -6,7 +6,6 @@
         Task<T?> GetByIdAsync(string id);
         Task<IEnumerable<T>> GetAllAsync();
         Task AddAsync(T entity);
-        Task UpdateAsync(T entity);
         Task UpdateAsync(int id, Action<T> updateAction);
         Task DeleteAsync(int id);
         Task DeleteAsync(T entity);

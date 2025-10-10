@@ -5,139 +5,112 @@
     Layout = "_Layout";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Create New Product</h3>
-                    <p class="text-muted mb-0">Add a new product to your inventory</p>
+<div class="max-w-4xl mx-auto mt-8 px-4">
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+            <h3 class="text-xl font-semibold mb-1">Create New Product</h3>
+            <p class="text-gray-500 text-sm">Add a new product to your inventory</p>
+        </div>
+
+        <div class="p-6">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Success!</strong> @TempData["SuccessMessage"]
+                    <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                        <button type="button" onclick="this.parentElement.parentElement.remove();">
+                            &times;
+                        </button>
+                    </span>
                 </div>
-                <div class="card-body">
-                    @if (TempData["SuccessMessage"] != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
+            }
 
-                    <form asp-action="CreateProduct" method="post" enctype="multipart/form-data">
-                        @Html.AntiForgeryToken()
+            <form asp-action="CreateProduct" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
 
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label asp-for="Name" class="form-label">Product Name *</label>
-                                    <input asp-for="Name" class="form-control" placeholder="Enter product name">
-                                    <span asp-validation-for="Name" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label asp-for="Description" class="form-label">Description</label>
-                                    <textarea asp-for="Description" class="form-control" rows="3"
-                                              placeholder="Enter product description"></textarea>
-                                    <span asp-validation-for="Description" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label asp-for="Price" class="form-label">Price *</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input asp-for="Price" type="number" step="0.01" class="form-control"
-                                               placeholder="0.00">
-                                    </div>
-                                    <span asp-validation-for="Price" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label asp-for="StockQuantity" class="form-label">Stock Quantity *</label>
-                                    <input asp-for="StockQuantity" type="number" class="form-control"
-                                           placeholder="Enter quantity">
-                                    <span asp-validation-for="StockQuantity" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label asp-for="Category" class="form-label">Category *</label>
-                                    <select asp-for="Category" class="form-select"
-                                            asp-items="@(ViewBag.Categories as SelectList)">
-                                        <option value="">-- Select Category --</option>
-                                    </select>
-                                    <span asp-validation-for="Category" class="text-danger"></span>
-                                    <small class="form-text text-muted">Or enter a new category</small>
-                                    <input type="text" class="form-control mt-1" id="newCategory"
-                                           placeholder="Enter new category" oninput="updateCategory(this.value)">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label asp-for="ImageUrl" class="form-label">Image URL</label>
-                                    <input asp-for="ImageUrl" type="url" class="form-control"
-                                           placeholder="https://example.com/image.jpg">
-                                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-check mb-4">
-                                    <input asp-for="IsActive" class="form-check-input">
-                                    <label asp-for="IsActive" class="form-check-label">
-                                        Product is active and available for sale
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <a href="@Url.Action("ManageProducts")" class="btn btn-outline-secondary me-md-2">
-                                        <i class="bi bi-arrow-left"></i> Cancel
-                                    </a>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-plus-circle"></i> Create Product
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                <!-- Product Name -->
+                <div class="mb-4">
+                    <label asp-for="Name" class="block text-gray-700 font-medium mb-1">Product Name *</label>
+                    <input asp-for="Name" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200" placeholder="Enter product name">
+                    <span asp-validation-for="Name" class="text-red-500 text-sm"></span>
                 </div>
-            </div>
+
+                <!-- Description -->
+                <div class="mb-4">
+                    <label asp-for="Description" class="block text-gray-700 font-medium mb-1">Description</label>
+                    <textarea asp-for="Description" rows="3" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200" placeholder="Enter product description"></textarea>
+                    <span asp-validation-for="Description" class="text-red-500 text-sm"></span>
+                </div>
+
+                <!-- Price & Stock -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label asp-for="Price" class="block text-gray-700 font-medium mb-1">Price *</label>
+                        <div class="flex">
+                            <span class="inline-flex items-center px-3 border border-r-0 border-gray-300 rounded-l bg-gray-100">$</span>
+                            <input asp-for="Price" type="number" step="0.01" class="w-full border border-gray-300 rounded-r px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200" placeholder="0.00">
+                        </div>
+                        <span asp-validation-for="Price" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="StockQuantity" class="block text-gray-700 font-medium mb-1">Stock Quantity *</label>
+                        <input asp-for="StockQuantity" type="number" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200" placeholder="Enter quantity">
+                        <span asp-validation-for="StockQuantity" class="text-red-500 text-sm"></span>
+                    </div>
+                </div>
+
+                <!-- Category & Image URL -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label asp-for="Category" class="block text-gray-700 font-medium mb-1">Category *</label>
+                        <select asp-for="Category" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200" asp-items="@(ViewBag.Categories as SelectList)">
+                            <option value="">-- Select Category --</option>
+                        </select>
+                        <span asp-validation-for="Category" class="text-red-500 text-sm"></span>
+                        <small class="text-gray-500 block mt-1">Or enter a new category</small>
+                        <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 mt-1 focus:outline-none focus:ring focus:ring-blue-200" id="newCategory" placeholder="Enter new category" oninput="updateCategory(this.value)">
+                    </div>
+
+                    <div>
+                        <label asp-for="ImageUrl" class="block text-gray-700 font-medium mb-1">Image URL</label>
+                        <input asp-for="ImageUrl" type="url" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200" placeholder="https://example.com/image.jpg">
+                        <span asp-validation-for="ImageUrl" class="text-red-500 text-sm"></span>
+                    </div>
+                </div>
+
+                <!-- Is Active -->
+                <div class="mb-4">
+                    <label class="inline-flex items-center">
+                        <input asp-for="IsActive" type="checkbox" class="form-checkbox h-5 w-5 text-blue-600">
+                        <span class="ml-2 text-gray-700">Product is active and available for sale</span>
+                    </label>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex justify-end gap-2">
+                    <a href="@Url.Action("ManageProducts")" class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-100">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Create Product
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
     <script>
         function updateCategory(value) {
             if (value) {
-                // Clear the select and set the new value
                 $('#Category').val('');
                 $('#Category').append(new Option(value, value));
                 $('#Category').val(value);
             }
         }
 
-        // Allow typing in category select
         $('#Category').on('change', function() {
             const select = $(this);
             const input = $('#newCategory');
@@ -146,54 +119,27 @@
             }
         });
 
-        // Initialize form validation
         $(document).ready(function() {
             $('form').validate({
                 rules: {
-                    Name: {
-                        required: true,
-                        minlength: 2
-                    },
-                    Price: {
-                        required: true,
-                        min: 0.01
-                    },
-                    StockQuantity: {
-                        required: true,
-                        min: 0
-                    },
-                    Category: {
-                        required: true
-                    }
+                    Name: { required: true, minlength: 2 },
+                    Price: { required: true, min: 0.01 },
+                    StockQuantity: { required: true, min: 0 },
+                    Category: { required: true }
                 },
                 messages: {
-                    Name: {
-                        required: "Please enter a product name",
-                        minlength: "Product name must be at least 2 characters"
-                    },
-                    Price: {
-                        required: "Please enter a price",
-                        min: "Price must be greater than 0"
-                    },
-                    StockQuantity: {
-                        required: "Please enter stock quantity",
-                        min: "Stock quantity cannot be negative"
-                    },
-                    Category: {
-                        required: "Please select or enter a category"
-                    }
+                    Name: { required: "Please enter a product name", minlength: "Product name must be at least 2 characters" },
+                    Price: { required: "Please enter a price", min: "Price must be greater than 0" },
+                    StockQuantity: { required: "Please enter stock quantity", min: "Stock quantity cannot be negative" },
+                    Category: { required: "Please select or enter a category" }
                 },
                 errorElement: 'span',
-                errorPlacement: function (error, element) {
-                    error.addClass('invalid-feedback');
-                    element.closest('.form-group').append(error);
+                errorPlacement: function(error, element) {
+                    error.addClass('text-red-500 text-sm');
+                    element.closest('div').append(error);
                 },
-                highlight: function (element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function (element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
-                }
+                highlight: function(element) { $(element).addClass('border-red-500'); },
+                unhighlight: function(element) { $(element).removeClass('border-red-500'); }
             });
         });
     </script>

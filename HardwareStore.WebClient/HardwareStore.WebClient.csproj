@@ -14,7 +14,6 @@
     <EmbeddedResource Remove="ViewModels\Profile\**" />
     <None Remove="ViewModels\Profile\**" />
   </ItemGroup>
-
 	
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.9" />

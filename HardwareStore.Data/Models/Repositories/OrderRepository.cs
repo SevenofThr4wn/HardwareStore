@@ -14,6 +14,17 @@ namespace HardwareStore.Data.Models.Repositories
             _context = context;
         }
 
+        public async Task CompleteOrderAsync(int id, OrderStatus updatedStatus)
+        {
+            var order = await GetByIdAsync(id);
+
+            if (order == null)
+                return;
+
+            order.Status = OrderStatus.Shipped;
+            _context.Update(order);
+        }
+
         public async Task UpdateOrderStatusAsync(int id, OrderStatus updatedStatus)
         {
             var order = await GetByIdAsync(id);

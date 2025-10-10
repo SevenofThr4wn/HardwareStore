@@ -2,137 +2,63 @@
     ViewData["Title"] = "Manage Products";
     Layout = "_Layout";
 }
-<head>
-    <style>
-        .management-container {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
 
-        .management-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .management-title {
-            font-size: 2.5rem;
-            font-weight: 600;
-            color: #1d1d1f;
-            margin: 0;
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .product-card {
-            background: #fff;
-            border: 1px solid #e5e5e7;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease;
-        }
-
-            .product-card:hover {
-                transform: translateY(-2px);
-            }
-
-        .product-image {
-            width: 100%;
-            height: 200px;
-            background: #f5f5f7;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-        }
-
-            .product-image i {
-                font-size: 3rem;
-                color: #8e8e93;
-            }
-
-        .product-name {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .product-price {
-            color: #0071e3;
-            font-weight: 600;
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .product-stock {
-            color: #86868b;
-            margin-bottom: 1rem;
-        }
-
-        .product-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-action {
-            flex: 1;
-            padding: 0.5rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="management-container">
-        <div class="management-header">
-            <h1 class="management-title">Manage Products</h1>
-        </div>
-        <a class="btn btn-primary" href="/Products/CreateProduct">
-            <i class="bi bi-plus-circle"></i> Add Product
+<div class="max-w-[1400px] mx-auto mt-8 px-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-semibold text-gray-900">Manage Products</h1>
+        <a href="/Products/CreateProduct" class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Product
         </a>
-
-        <div class="products-grid">
-            @foreach (var product in Model)
-            {
-                <div class="product-card">
-                    <div class="product-image">
-                        @if (!string.IsNullOrEmpty(product.ImageUrl))
-                        {
-                            <img src="@product.ImageUrl" alt="@product.Name" style="width:100%;height:200px;object-fit:cover;border-radius:12px;" />
-                        }
-                        else
-                        {
-                            <i class="bi bi-tools"></i>
-                        }
-                    </div>
-
-                    <h3 class="product-name">@product.Name</h3>
-                    <div class="product-price">$@product.Price.ToString("F2")</div>
-
-                    <div class="product-stock">
-                        @if (product.StockQuantity < 10)
-                        {
-                            <span style="color:red;">Low stock: @product.StockQuantity units</span>
-                        }
-                        else
-                        {
-                            <p>In stock: @product.StockQuantity units</p>
-                        }
-                    </div>
-
-                    <div class="product-actions">
-                        <button class="btn btn-outline-primary btn-action" onclick="editProduct(@product.Id)">Edit</button>
-                        <button class="btn btn-outline-danger btn-action" onclick="deleteProduct(@product.Id)">Delete</button>
-                    </div>
-                </div>
-            }
-        </div>
     </div>
-</body>
+
+    <!-- Products Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @foreach (var product in Model)
+        {
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:-translate-y-1 transition-transform">
+                <!-- Product Image -->
+                <div class="w-full h-48 bg-gray-100 rounded-xl flex items-center justify-center mb-4 overflow-hidden">
+                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                    {
+                        <img src="@product.ImageUrl" alt="@product.Name" class="w-full h-full object-cover" />
+                    }
+                    else
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L15 12l-5.25-5M15 12H3" />
+                        </svg>
+                    }
+                </div>
+
+                <!-- Product Info -->
+                <h3 class="text-lg font-semibold mb-1">@product.Name</h3>
+                <div class="text-blue-600 font-semibold text-lg mb-1">$@product.Price.ToString("F2")</div>
+
+                <div class="text-gray-500 mb-4">
+                    @if (product.StockQuantity < 10)
+                    {
+                        <span class="text-red-500 font-medium">Low stock: @product.StockQuantity units</span>
+                    }
+                    else
+                    {
+                        <p>In stock: @product.StockQuantity units</p>
+                    }
+                </div>
+
+                <!-- Product Actions -->
+                <div class="flex gap-2">
+                    <button class="flex-1 px-3 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50" onclick="editProduct(@product.Id)">
+                        Edit
+                    </button>
+                    <button class="flex-1 px-3 py-2 border border-red-600 text-red-600 rounded-lg hover:bg-red-50" onclick="deleteProduct(@product.Id)">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</div>

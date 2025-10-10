@@ -14,6 +14,7 @@ namespace HardwareStore.Data.Context
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
 
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -2,20 +2,294 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>The below points are to be implemented / fixed</p>
-</div>
-<ul>
-    <li>Implement the following operations through custom pages instead of Keycloak pages
-        <ul>
-            <li>&#128073 Forgot / Change Password</li>
-            <li>&#128073 Account Management</li> 
-        </ul>
-    </li>
-    <li> &#128073 Design home page</li>
-    <li> &#128073 Add marketplace page accessible to users</li>
-    <li> &#128073 Test notifications for both users and admins</li>
-    <li> &#128073 Fix roles entry in Database</li>
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechCore | Premium PC Hardware & Components</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        #vanta-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #38bdf8 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen overflow-x-hidden">
+    <div id="vanta-bg"></div>
+
+    <!-- Navigation -->
+    <nav class="bg-white bg-opacity-80 backdrop-blur-md shadow-sm fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"></div>
+                        <span class="text-xl font-bold text-gray-900">TechCore</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-primary-600 font-medium">Home</a>
+                    <a href="#" class="text-gray-700 hover:text-primary-600 font-medium">Shop</a>
+                    <a href="#" class="text-gray-700 hover:text-primary-600 font-medium">Brands</a>
+                    <a href="#" class="text-gray-700 hover:text-primary-600 font-medium">Support</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="hidden md:block px-4 py-2 rounded-lg text-primary-600 font-medium hover:bg-primary-50 transition">Sign In</button>
+                    <button class="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium hover:shadow-lg transition">Cart</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center">
+                <h1 class="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
+                    <span class="gradient-text">Power Up</span> Your Build
+                </h1>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
+                    Explore top-tier PC components — from graphics cards to gaming rigs. Built for performance, precision, and passion.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button class="px-8 py-4 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-bold hover:shadow-xl transition transform hover:-translate-y-1">
+                        Shop Products
+                    </button>
+                    <button class="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:border-primary-300 hover:text-primary-600 transition">
+                        <div class="flex items-center justify-center space-x-2">
+                            <i data-feather="play-circle"></i>
+                            <span>Watch Showcase</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <div class="mt-20 relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-primary-100 to-secondary-100 blur-3xl opacity-40 rounded-full"></div>
+                <div class="relative bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                    <img src="https://cdn.pixabay.com/photo/2019/10/22/11/06/pc-4562231_1280.jpg" alt="Gaming PC" class="w-full h-auto">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose TechCore?</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Everything you need to build, upgrade, and optimize your dream PC.
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 card-hover transition">
+                    <div class="w-14 h-14 rounded-lg bg-primary-50 flex items-center justify-center mb-6">
+                        <i data-feather="cpu" class="w-6 h-6 text-primary-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">High-Performance Components</h3>
+                    <p class="text-gray-600">
+                        Top-tier CPUs, GPUs, and motherboards from trusted brands for gaming and professional builds.
+                    </p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 card-hover transition">
+                    <div class="w-14 h-14 rounded-lg bg-secondary-50 flex items-center justify-center mb-6">
+                        <i data-feather="package" class="w-6 h-6 text-secondary-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Custom PC Builds</h3>
+                    <p class="text-gray-600">
+                        Tailored systems for every budget — hand-built, tested, and ready to perform right out of the box.
+                    </p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 card-hover transition">
+                    <div class="w-14 h-14 rounded-lg bg-primary-50 flex items-center justify-center mb-6">
+                        <i data-feather="truck" class="w-6 h-6 text-primary-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Fast & Secure Shipping</h3>
+                    <p class="text-gray-600">
+                        Nationwide delivery with premium packaging and real-time tracking on every order.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary-500 to-secondary-500">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Upgrade Your Setup Today</h2>
+            <p class="text-lg text-primary-100 mb-8">
+                From gaming to productivity — find the hardware that powers your performance.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button class="px-8 py-4 bg-white text-primary-600 rounded-xl font-bold hover:bg-gray-100 transition shadow-lg transform hover:-translate-y-1">
+                    Browse Store
+                </button>
+                <button class="px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl font-bold hover:bg-white hover:bg-opacity-10 transition">
+                    Contact Sales
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="text-white font-bold text-lg mb-4">Shop</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="hover:text-white transition">Graphics Cards</a></li>
+                        <li><a href="#" class="hover:text-white transition">Processors</a></li>
+                        <li><a href="#" class="hover:text-white transition">Motherboards</a></li>
+                        <li><a href="#" class="hover:text-white transition">Storage</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-lg mb-4">Support</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="hover:text-white transition">Warranty</a></li>
+                        <li><a href="#" class="hover:text-white transition">Returns</a></li>
+                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-lg mb-4">Company</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition">Partners</a></li>
+                        <li><a href="#" class="hover:text-white transition">News</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-lg mb-4">Stay Connected</h4>
+                    <div class="flex space-x-4 mb-6">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 hover:text-white transition">
+                            <i data-feather="facebook"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 hover:text-white transition">
+                            <i data-feather="instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 hover:text-white transition">
+                            <i data-feather="twitter"></i>
+                        </a>
+                    </div>
+                    <p class="text-sm">
+                        Subscribe for the latest hardware drops and deals.
+                    </p>
+                    <div class="mt-4 flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 bg-gray-800 text-white rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 w-full">
+                        <button class="px-4 py-2 bg-primary-600 text-white rounded-r-lg font-medium hover:bg-primary-700 transition">
+                            <i data-feather="send"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"></div>
+                    <span class="text-white font-bold">TechCore</span>
+                </div>
+                <div class="text-sm">
+                    &copy; 2025 TechCore Hardware. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        VANTA.GLOBE({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x3b82f6,
+            backgroundColor: 0xf1f5f9,
+            size: 0.8
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+            const cards = document.querySelectorAll('.card-hover');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.5s ease ' + (index * 0.1) + 's';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>
+
 

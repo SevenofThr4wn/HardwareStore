@@ -2,115 +2,50 @@
     ViewData["Title"] = "Admin Settings";
     Layout = "_Layout";
 }
-<head>
-    <style>
-        .settings-container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
 
-        .settings-header {
-            margin-bottom: 2rem;
-        }
+<div class="max-w-4xl mx-auto mt-8 px-6">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-4xl font-semibold text-gray-900">Admin Settings</h1>
+        <p class="text-gray-500">System configuration and preferences</p>
+    </div>
 
-        .settings-title {
-            font-size: 2.5rem;
-            font-weight: 600;
-            color: #1d1d1f;
-        }
+    <!-- Settings Card -->
+    <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-md space-y-8">
+        <!-- System Settings Section -->
+        <div class="space-y-6">
+            <h3 class="text-2xl font-semibold text-gray-900">System Settings</h3>
 
-        .settings-card {
-            background: #fff;
-            border: 1px solid #e5e5e7;
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        .settings-section {
-            margin-bottom: 2rem;
-        }
-
-            .settings-section:last-child {
-                margin-bottom: 0;
-            }
-
-        .settings-section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #1d1d1f;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #1d1d1f;
-        }
-
-        .form-control {
-            border-radius: 12px;
-            border: 2px solid #e5e5e7;
-            padding: 1rem;
-        }
-
-        .btn-save {
-            background-color: #0071e3;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 1rem 2rem;
-            font-weight: 600;
-        }
-
-            .btn-save:hover {
-                background-color: #0062c4;
-            }
-    </style>
-</head>
-<body>
-    <div class="settings-container">
-        <div class="settings-header">
-            <h1 class="settings-title">Admin Settings</h1>
-            <p class="text-muted">System configuration and preferences</p>
-        </div>
-
-        <div class="settings-card">
-            <div class="settings-section">
-                <h3 class="settings-section-title">System Settings</h3>
-
-                <div class="form-group">
-                    <label class="form-label">Store Name</label>
-                    <input type="text" class="form-control" value="Hardware Store Pro">
+            <div class="space-y-4">
+                <div>
+                    <label class="block font-semibold text-gray-900 mb-2">Store Name</label>
+                    <input type="text" class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300" value="Hardware Store Pro">
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Store Email</label>
-                    <input type="email" class="form-control" value="admin@hardwarestore.com">
+                <div>
+                    <label class="block font-semibold text-gray-900 mb-2">Store Email</label>
+                    <input type="email" class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300" value="admin@hardwarestore.com">
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Currency</label>
-                    <select class="form-control">
+                <div>
+                    <label class="block font-semibold text-gray-900 mb-2">Currency</label>
+                    <select class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300">
                         <option selected>USD ($)</option>
                         <option>EUR (€)</option>
                         <option>GBP (£)</option>
                     </select>
                 </div>
             </div>
+        </div>
 
-            <div class="settings-section">
-                <h3 class="settings-section-title">Security Settings</h3>
+        <!-- Security Settings Section -->
+        <div class="space-y-6">
+            <h3 class="text-2xl font-semibold text-gray-900">Security Settings</h3>
 
-                <div class="form-group">
-                    <label class="form-label">Session Timeout</label>
-                    <select class="form-control">
+            <div class="space-y-4">
+                <div>
+                    <label class="block font-semibold text-gray-900 mb-2">Session Timeout</label>
+                    <select class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300">
                         <option>15 minutes</option>
                         <option>30 minutes</option>
                         <option selected>60 minutes</option>
@@ -118,19 +53,23 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Password Policy</label>
-                    <select class="form-control">
+                <div>
+                    <label class="block font-semibold text-gray-900 mb-2">Password Policy</label>
+                    <select class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300">
                         <option>Basic (6+ characters)</option>
                         <option selected>Standard (8+ characters with numbers)</option>
                         <option>Strong (12+ characters with numbers and symbols)</option>
                     </select>
                 </div>
             </div>
-
-            <button class="btn-save">
-                <i class="bi bi-check-circle"></i> Save Settings
-            </button>
         </div>
+
+        <!-- Save Button -->
+        <button class="inline-flex items-center bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-blue-700 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m0 0a9 9 0 11-4 4" />
+            </svg>
+            Save Settings
+        </button>
     </div>
-</body>
+</div>

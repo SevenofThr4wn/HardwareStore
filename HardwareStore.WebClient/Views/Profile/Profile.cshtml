@@ -3,540 +3,202 @@
     ViewData["Title"] = "Account Management";
     Layout = "_Layout";
 }
-<head>
-    <style>
-        /* Base styles */
-        body {
-            background-color: #f5f5f7;
-            color: #1d1d1f;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 16px;
-        }
 
-        .apple-header {
-            background-color: rgba(0,0,0,0.8);
-        }
-
-        /* Cards */
-        .account-card, .device-card {
-            border-radius: 16px;
-            background: #fff;
-            border: 1px solid #e5e5e7;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-            .account-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 16px 32px rgba(0,0,0,0.12);
-            }
-
-        .device-card {
-            border-left: 5px solid #0071e3;
-        }
-
-            .device-card:hover {
-                transform: translateY(-2px);
-            }
-
-        /* Navigation */
-        .nav-pills .nav-link {
-            font-size: 1.1rem;
-            padding: 0.75rem 1rem;
-            color: #1d1d1f;
-            border-radius: 12px;
-            margin-bottom: 0.5rem;
-        }
-
-            .nav-pills .nav-link:hover {
-                background-color: #6699ff;
-                transform: translateX(4px);
-            }
-
-            .nav-pills .nav-link.active {
-                background-color: #0071e3;
-            }
-
-        /* Buttons */
-        .btn, .btn-apple {
-            border-radius: 12px;
-            font-weight: 500;
-            transition: transform 0.2s ease;
-        }
-
-        .btn-apple {
-            background-color: #0071e3;
-            color: #fff;
-            font-size: 1.1rem;
-            padding: 0.75rem 1.5rem;
-        }
-
-            .btn-apple:hover {
-                background-color: #0062c4;
-                transform: translateY(-1px);
-            }
-
-        .security-item {
-            border-left: 4px solid #0071e3;
-            padding: 1.5rem;
-            border-radius: 12px;
-            background: #f8f9fa;
-        }
-
-        .badge-staff, .badge-admin, .badge-manager {
-            color: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 24px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            box-shadow: 0 6px 12px rgba(139,92,246,0.25);
-            line-height: 1.2;
-            white-space: nowrap;
-        }
-
-        .badge-staff {
-            background: #3366ff;
-        }
-
-        .badge-admin {
-            background: #cc0000;
-            display: inline;
-        }
-
-        .badge-manager {
-            background: #9933ff;
-            display: inline-block;
-            position: relative;
-            top: 15px;
-        }
-
-        .badges-inline {
-            margin: 0.9rem 0;
-            line-height: 1;
-        }
-
-            .badges-inline .badge-manager + .badge-admin,
-            .badges-inline .badge-admin + .badge-manager {
-                margin-left: 0.5rem;
-            }
-
-            .badges-inline .badge-manager,
-            .badges-inline .badge-admin {
-                vertical-align: baseline;
-            }
-
-        .badge-icon {
-            margin-right: 0.3rem !important;
-            font-size: 0.7rem;
-            vertical-align: -0.1em;
-        }
-
-        .admin-btn {
-            background: linear-gradient(135deg,#ff2d20,#cc0000);
-            color: #fff;
-            border: none;
-            margin-top: 1rem;
-        }
-
-            .admin-btn:hover {
-                background: linear-gradient(135deg,#cc0000,#e62a1d);
-            }
-
-        .container {
-            max-width: 1600px;
-            padding: 0 2rem;
-        }
-
-        main.container {
-            margin: 3rem 0;
-        }
-
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
-
-        h5 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        h6 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-
-        .card-body {
-            padding: 2rem;
-        }
-
-        .table {
-            font-size: 1.05rem;
-        }
-
-            .table th {
-                font-size: 1.1rem;
-                font-weight: 600;
-                padding: 1rem 0.75rem;
-            }
-
-            .table td {
-                padding: 0.875rem 0.75rem;
-            }
-
-        .btn {
-            font-size: 1.05rem;
-            padding: 0.625rem 1.25rem;
-            border-radius: 10px;
-        }
-
-        .btn-sm {
-            font-size: 0.95rem;
-            padding: 0.5rem 1rem;
-        }
-
-        .bi {
-            font-size: 1.2em;
-        }
-
-        .fs-1 {
-            font-size: 3.5rem !important;
-        }
-
-        .fs-3 {
-            font-size: 2rem !important;
-        }
-
-        /* Responsive */
-        @@media (max-width: 768px) {
-            body {
-                font-size: 14px;
-            }
-
-            .container {
-                padding: 0 1rem;
-                max-width: 100%;
-            }
-
-            .card-body {
-                padding: 1.5rem;
-            }
-
-            .card-title {
-                font-size: 1.3rem;
-            }
-
-            .fs-1 {
-                font-size: 2.5rem !important;
-            }
-        }
-
-        @@media (min-width:1920px) and (max-width:2560px) {
-            .container {
-                max-width: 1800px;
-            }
-
-            body {
-                font-size: 17px;
-            }
-
-            .card-title {
-                font-size: 1.6rem;
-            }
-        }
-
-        @@media (min-width:2560px) {
-            .container {
-                max-width: 2000px;
-            }
-
-            body {
-                font-size: 18px;
-            }
-
-            .card-title {
-                font-size: 1.75rem;
-            }
-
-            h5 {
-                font-size: 1.5rem;
-            }
-
-            h6 {
-                font-size: 1.25rem;
-            }
-
-            .card-body {
-                padding: 2.5rem;
-            }
-
-            .table {
-                font-size: 1.15rem;
-            }
-
-            .btn {
-                font-size: 1.1rem;
-                padding: 0.75rem 1.5rem;
-            }
-
-            .bi {
-                font-size: 1.3em;
-            }
-
-            .fs-1 {
-                font-size: 4rem !important;
-            }
-
-            .fs-3 {
-                font-size: 2.5rem !important;
-            }
-        }
-
-        @@media (min-width:3840px) {
-            .container {
-                max-width: 2400px;
-            }
-
-            body {
-                font-size: 20px;
-            }
-        }
-
-        @@media (-webkit-min-device-pixel-ratio:2), (min-resolution:192dpi) {
-            .account-card {
-                box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            }
-
-            .badge-manager {
-                box-shadow: 0 4px 16px rgba(139,92,246,0.2);
-            }
-        }
-
-        @@media (prefers-reduced-motion: reduce) {
-            .account-card, .device-card, .btn-apple {
-                transition: none;
-                transform: none !important;
-            }
-        }
-
-        .row {
-            margin: 0 -0.75rem;
-        }
-
-        .col-md-3, .col-md-9 {
-            padding: 0 0.75rem;
-        }
-
-        .mb-4 {
-            margin-bottom: 2rem !important;
-        }
-
-        .my-4 {
-            margin: 2rem 0 !important;
-        }
-    </style>
-
-</head>
-<body>
-    <!-- Main Content -->
-    <main class="container my-4">
-        <div class="row">
-            <div class="col-md-3 mb-4">
-                <div class="card account-card mb-3">
-                    <div class="card-body text-center">
-                        <i class="bi bi-person-circle fs-1 text-secondary mb-2"></i>
-                        <h5 class="card-title">@Model.DisplayName</h5>
-                        <p class="text-muted">@Model.Email</p>
-
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <div class="badges-inline">
-                                <span class="badge-staff"><i class="bi bi-briefcase badge-icon"></i>Staff</span>
-                                <span class="badge-admin"><i class="bi bi-shield-check badge-icon"></i>Administrator</span>
-                            </div>
-                        }
-                        @if (User.IsInRole("Manager"))
-                        {
-                            <div class="badges-inline">
-                                <span class="badge-staff"><i class="bi bi-briefcase badge-icon"></i>Staff</span>
-                                <span class="badge-admin"><i class="bi bi-shield-check badge-icon"></i>Administrator</span>
-                                <span class="badge-manager"><i class="bi bi-gear badge-icon"></i>Manager</span>
-                            </div>
-                        }
-
-                        @if (User.IsInRole("Staff"))
-                        {
-                            <div class="badges-inline"><span class="badge-staff"><i class="bi bi-briefcase badge-icon"></i>Staff</span></div>
-                        }
+<main class="max-w-7xl mx-auto my-12 px-6">
+    <div class="flex flex-col md:flex-row md:space-x-6">
+        <!-- Sidebar -->
+        <aside class="md:w-1/4 mb-8 md:mb-0">
+            <!-- User Card -->
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 text-center mb-6 transform transition hover:-translate-y-1 hover:shadow-2xl">
+                <i class="bi bi-person-circle text-gray-400 text-6xl mb-4"></i>
+                <h5 class="text-xl font-semibold mb-1">@Model.DisplayName</h5>
+                <p class="text-gray-500 text-sm mb-4">@Model.Email</p>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="flex flex-wrap justify-center gap-2 mb-2">
+                        <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                            <i class="bi bi-briefcase text-xs"></i> Staff
+                        </span>
+                        <span class="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                            <i class="bi bi-shield-check text-xs"></i> Administrator
+                        </span>
                     </div>
-                </div>
+                }
+                @if (User.IsInRole("Manager"))
+                {
+                    <div class="flex flex-wrap justify-center gap-2 mb-2">
+                        <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                            <i class="bi bi-briefcase text-xs"></i> Staff
+                        </span>
+                        <span class="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                            <i class="bi bi-shield-check text-xs"></i> Administrator
+                        </span>
+                        <span class="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                            <i class="bi bi-gear text-xs"></i> Manager
+                        </span>
+                    </div>
+                }
+                @if (User.IsInRole("Staff"))
+                {
+                    <div class="flex justify-center mb-2">
+                        <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                            <i class="bi bi-briefcase text-xs"></i> Staff
+                        </span>
+                    </div>
+                }
+            </div>
 
-                <ul class="nav nav-pills flex-column">
-                    <li class="nav-item"><a class="nav-link active" href="#"><i class="bi bi-person me-2"></i> Account</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-shield-lock me-2"></i> Security</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-credit-card me-2"></i> Payment & Shipping</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-phone me-2"></i> Devices</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-cloud me-2"></i> iCloud</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-people me-2"></i> Family Sharing</a></li>
+            <!-- Navigation -->
+            <ul class="flex flex-col space-y-2">
+                <li><a class="flex items-center px-4 py-2 rounded-xl text-gray-900 bg-blue-600 text-white" href="#"><i class="bi bi-person me-2"></i> Account</a></li>
+                <li><a class="flex items-center px-4 py-2 rounded-xl text-gray-900 hover:bg-blue-100 transition" href="#"><i class="bi bi-shield-lock me-2"></i> Security</a></li>
+                <li><a class="flex items-center px-4 py-2 rounded-xl text-gray-900 hover:bg-blue-100 transition" href="#"><i class="bi bi-credit-card me-2"></i> Payment & Shipping</a></li>
+                <li><a class="flex items-center px-4 py-2 rounded-xl text-gray-900 hover:bg-blue-100 transition" href="#"><i class="bi bi-phone me-2"></i> Devices</a></li>
+                <li><a class="flex items-center px-4 py-2 rounded-xl text-gray-900 hover:bg-blue-100 transition" href="#"><i class="bi bi-cloud me-2"></i> iCloud</a></li>
+                <li><a class="flex items-center px-4 py-2 rounded-xl text-gray-900 hover:bg-blue-100 transition" href="#"><i class="bi bi-people me-2"></i> Family Sharing</a></li>
 
-                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-                    {
-                        <li class="nav-item mt-3">
-                            <div class="dropdown w-100">
-                                <button class="btn admin-btn w-100 dropdown-toggle" type="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-shield-lock me-2"></i> Admin Panel
-                                </button>
-                                <ul class="dropdown-menu w-100" aria-labelledby="adminDropdown">
-                                    <li><a class="dropdown-item" href="/Dashboard/AdminDashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
-                                    <li><a class="dropdown-item" href="/Users/ManageUsers"><i class="bi bi-people me-2"></i> Manage Users</a></li>
-                                    <li><a class="dropdown-item" href="/Products/ManageProducts"><i class="bi bi-box me-2"></i> Manage Products</a></li>
-                                    <li><a class="dropdown-item" href="/Orders/ManageOrders"><i class="bi bi-cart me-2"></i> Manage Orders</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/Settings/AdminSettings"><i class="bi bi-gear me-2"></i> Admin Settings</a></li>
-                                    @if (User.IsInRole("Manager"))
-                                    {
-                                        <li><a class="dropdown-item" href="/Settings/ManagerSettings"><i class="bi bi-gear me-2"></i> Manager Settings</a></li>
-                                    }
-                                </ul>
-                            </div>
-                        </li>
-                    }
-
-                    <li class="nav-item">
-                        <form asp-controller="Auth" asp-action="Logout" method="post" class="mt-3">
-                            <button type="submit" class="btn btn-outline-danger w-100">
-                                <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
+                    <li class="mt-3">
+                        <div class="relative">
+                            <button class="w-full bg-gradient-to-tr from-red-600 to-red-500 text-white font-semibold px-4 py-2 rounded-xl flex items-center justify-center focus:outline-none">
+                                <i class="bi bi-shield-lock me-2"></i> Admin Panel
                             </button>
-                        </form>
+                            <ul class="absolute left-0 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg hidden group-hover:block z-10">
+                                <li><a class="block px-4 py-2 hover:bg-gray-100" href="/Dashboard/AdminDashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                                <li><a class="block px-4 py-2 hover:bg-gray-100" href="/Users/ManageUsers"><i class="bi bi-people me-2"></i> Manage Users</a></li>
+                                <li><a class="block px-4 py-2 hover:bg-gray-100" href="/Products/ManageProducts"><i class="bi bi-box me-2"></i> Manage Products</a></li>
+                                <li><a class="block px-4 py-2 hover:bg-gray-100" href="/Orders/ManageOrders"><i class="bi bi-cart me-2"></i> Manage Orders</a></li>
+                                <li><hr class="my-1 border-gray-200" /></li>
+                                <li><a class="block px-4 py-2 hover:bg-gray-100" href="/Settings/AdminSettings"><i class="bi bi-gear me-2"></i> Admin Settings</a></li>
+                                @if (User.IsInRole("Manager"))
+                                {
+                                    <li><a class="block px-4 py-2 hover:bg-gray-100" href="/Settings/ManagerSettings"><i class="bi bi-gear me-2"></i> Manager Settings</a></li>
+                                }
+                            </ul>
+                        </div>
                     </li>
-                </ul>
-            </div>
+                }
 
-            <div class="col-md-9">
-                <div class="card account-card mb-4">
-                    <div class="card-body">
-                        <h4 class="card-title mb-4">Account</h4>
+                <li class="mt-3">
+                    <form asp-controller="Auth" asp-action="Logout" method="post">
+                        <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-xl flex items-center justify-center hover:bg-red-700 transition">
+                            <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </aside>
 
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h5>Personal Information</h5>
-                                <p class="text-muted">@Model.DisplayName</p>
-                                <p class="text-muted">@Model.Email</p>
-                                <button class="btn btn-outline-secondary btn-sm">Edit</button>
-                            </div>
-                            <div class="col-md-6">
-                                <h5>Contact Information</h5>
-                                <p class="text-muted">+1 (555) 123-4567</p>
-                                <p class="text-muted">123 Apple Street, Cupertino, CA 95014</p>
-                                <button class="btn btn-outline-secondary btn-sm">Edit</button>
-                            </div>
-                        </div>
+        <!-- Main Content -->
+        <section class="md:w-3/4 space-y-6">
+            <!-- Account Info Card -->
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 space-y-6">
+                <h4 class="text-2xl font-semibold">Account</h4>
 
-                        <hr class="my-4">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Personal Info -->
+                    <div>
+                        <h5 class="text-lg font-semibold mb-2">Personal Information</h5>
+                        <p class="text-gray-500">@Model.DisplayName</p>
+                        <p class="text-gray-500">@Model.Email</p>
+                        <button class="mt-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition text-sm">Edit</button>
+                    </div>
 
-                        <h5 class="mb-3">Security</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="p-3 security-item">
-                                    <h6><i class="bi bi-shield-lock me-2"></i> Password</h6>
-                                    <p class="text-muted">Last changed 3 months ago</p>
-                                    <button class="btn btn-outline-secondary btn-sm">Change Password</button>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="p-3 security-item">
-                                    <h6><i class="bi bi-key me-2"></i> Two-Factor Authentication</h6>
-                                    <p class="text-muted">Enabled</p>
-                                    <button class="btn btn-outline-secondary btn-sm">Manage</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        <h5 class="mb-3">Orders</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="card device-card">
-                                    <div class="card-body">
-                                        <div class="d-flex">
-                                            <i class="bi bi-phone fs-3 me-3"></i>
-                                            <div>
-                                                <h6>NVIDIA RTX 4090</h6>
-                                                <p class="text-muted mb-1">Price: $2000 AUD</p>
-                                                <small class="text-muted">Order Placed: Today</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="card device-card">
-                                    <div class="card-body">
-                                        <div class="d-flex">
-                                            <i class="bi bi-laptop fs-3 me-3"></i>
-                                            <div>
-                                                <h6>MacBook Pro</h6>
-                                                <p class="text-muted mb-1">Price: $500 AUD</p>
-                                                <small class="text-muted">Order Placed: Yesterday</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Contact Info -->
+                    <div>
+                        <h5 class="text-lg font-semibold mb-2">Contact Information</h5>
+                        <p class="text-gray-500">+1 (555) 123-4567</p>
+                        <p class="text-gray-500">123 Apple Street, Cupertino, CA 95014</p>
+                        <button class="mt-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition text-sm">Edit</button>
                     </div>
                 </div>
 
-                <div class="card account-card">
-                    <div class="card-body">
-                        <h4 class="card-title mb-4">Completed Orders</h4>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Order Name</th>
-                                        <th>Items</th>
-                                        <th>Date Completed</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><i class="bi bi-music-note-beamed me-2"></i> Apple Music</td>
-                                        <td>Individual</td>
-                                        <td>June 15, 2023</td>
-                                        <td><button class="btn btn-outline-secondary btn-sm">Manage</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="bi bi-tv me-2"></i> Apple TV+</td>
-                                        <td>Family</td>
-                                        <td>June 20, 2023</td>
-                                        <td><button class="btn btn-outline-secondary btn-sm">Manage</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="bi bi-cloud me-2"></i> iCloud</td>
-                                        <td>200GB</td>
-                                        <td>June 1, 2023</td>
-                                        <td>
-                                            <a class="btn btn-outline-secondary btn-sm" href="/Order/ManageOrder">
-                                                Manage
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <!-- Security -->
+                <hr class="my-4 border-gray-200" />
+                <h5 class="text-lg font-semibold mb-2">Security</h5>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 border-l-4 border-blue-600 p-4 rounded-lg">
+                        <h6 class="font-semibold flex items-center gap-2"><i class="bi bi-shield-lock"></i> Password</h6>
+                        <p class="text-gray-500">Last changed 3 months ago</p>
+                        <button class="mt-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition text-sm">Change Password</button>
+                    </div>
+                    <div class="bg-gray-50 border-l-4 border-blue-600 p-4 rounded-lg">
+                        <h6 class="font-semibold flex items-center gap-2"><i class="bi bi-key"></i> Two-Factor Authentication</h6>
+                        <p class="text-gray-500">Enabled</p>
+                        <button class="mt-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition text-sm">Manage</button>
+                    </div>
+                </div>
+
+                <!-- Orders -->
+                <hr class="my-4 border-gray-200" />
+                <h5 class="text-lg font-semibold mb-2">Orders</h5>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white border-l-4 border-blue-600 shadow rounded-xl p-4 flex items-center gap-4">
+                        <i class="bi bi-phone text-2xl"></i>
+                        <div>
+                            <h6 class="font-semibold">NVIDIA RTX 4090</h6>
+                            <p class="text-gray-500 mb-1">Price: $2000 AUD</p>
+                            <small class="text-gray-400">Order Placed: Today</small>
+                        </div>
+                    </div>
+                    <div class="bg-white border-l-4 border-blue-600 shadow rounded-xl p-4 flex items-center gap-4">
+                        <i class="bi bi-laptop text-2xl"></i>
+                        <div>
+                            <h6 class="font-semibold">MacBook Pro</h6>
+                            <p class="text-gray-500 mb-1">Price: $500 AUD</p>
+                            <small class="text-gray-400">Order Placed: Yesterday</small>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
-</body>
+
+            <!-- Completed Orders Table -->
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
+                <h4 class="text-2xl font-semibold mb-4">Completed Orders</h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-700">Order Name</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-700">Items</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-700">Date Completed</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-700">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-4 py-2"><i class="bi bi-music-note-beamed me-2"></i> Apple Music</td>
+                                <td class="px-4 py-2">Individual</td>
+                                <td class="px-4 py-2">June 15, 2023</td>
+                                <td class="px-4 py-2">
+                                    <button class="px-3 py-1 border border-gray-300 rounded text-gray-700 hover:bg-gray-100 transition text-sm">Manage</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2"><i class="bi bi-tv me-2"></i> Apple TV+</td>
+                                <td class="px-4 py-2">Family</td>
+                                <td class="px-4 py-2">June 20, 2023</td>
+                                <td class="px-4 py-2">
+                                    <button class="px-3 py-1 border border-gray-300 rounded text-gray-700 hover:bg-gray-100 transition text-sm">Manage</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2"><i class="bi bi-cloud me-2"></i> iCloud</td>
+                                <td class="px-4 py-2">200GB</td>
+                                <td class="px-4 py-2">June 1, 2023</td>
+                                <td class="px-4 py-2">
+                                    <a href="/Order/ManageOrder" class="px-3 py-1 border border-gray-300 rounded text-gray-700 hover:bg-gray-100 transition text-sm">Manage</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
 
 @section Scripts {
     <script src="https://unpkg.com/feather-icons"></script>

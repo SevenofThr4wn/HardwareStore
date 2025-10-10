@@ -7,42 +7,51 @@ using System.Text.Json;
 
 namespace HardwareStore.Services.Tasks
 {
-    public class KeyCloakSync
+    /// <summary>
+    /// Provides functionality to synchronize users and their roles from Keycloak into the local application database.
+    /// </summary>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="KeyCloakSync"/> class.
+    /// </remarks>
+    /// <param name="context">The database context to use.</param>
+    /// <param name="httpClient">The HTTP client used for communicating with the Keycloak API.</param>
+    /// <param name="serverUrl">The base URL of the Keycloak server.</param>
+    /// <param name="realm">The Keycloak realm to synchronize from.</param>
+    /// <param name="adminUser">The Keycloak admin username used for authentication.</param>
+    /// <param name="adminPassword">The Keycloak admin password used for authentication.</param>
+    public class KeyCloakSync(
+        AppDbContext context,
+        HttpClient httpClient,
+        string serverUrl,
+        string realm,
+        string adminUser,
+        string adminPassword)
     {
-        private readonly AppDbContext _context;
-        private readonly HttpClient _httpClient;
-        private readonly string _serverUrl;
-        private readonly string _realm;
-        private readonly string _adminUser;
-        private readonly string _adminPassword;
+        private readonly AppDbContext _context = context;
+        private readonly HttpClient _httpClient = httpClient;
+        private readonly string _serverUrl = serverUrl.TrimEnd('/');
+        private readonly string _realm = realm;
+        private readonly string _adminUser = adminUser;
+        private readonly string _adminPassword = adminPassword;
 
-        public KeyCloakSync(AppDbContext context,
-            HttpClient httpClient,
-            string serverUrl,
-            string realm,
-            string adminUser,
-            string adminPassword)
-        {
-            _context = context;
-            _httpClient = httpClient;
-            _serverUrl = serverUrl.TrimEnd('/');
-            _realm = realm;
-            _adminUser = adminUser;
-            _adminPassword = adminPassword;
-        }
-
+        /// <summary>
+        /// Retrieves a Keycloak admin access token using the configured credentials.
+        /// </summary>
+        /// <returns>A JWT access token string.</returns>
+        /// <exception cref="HttpRequestException">Thrown when the token request fails.</exception>
         private async Task<string> GetAdminTokenAsync()
         {
-            var content = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string,string>("grant_type","password"),
-                new KeyValuePair<string,string>("client_id","admin-cli"),
-                new KeyValuePair<string,string>("username", _adminUser),
-                new KeyValuePair<string,string>("password", _adminPassword)
-            });
+            var content = new FormUrlEncodedContent(
+                [ new KeyValuePair<string, string>("grant_type", "password"), new KeyValuePair<string, string>(
+                    "client_id",
+                    "admin-cli"), new KeyValuePair<string, string>("username", _adminUser), new KeyValuePair<string, string>(
+                    "password",
+                    _adminPassword) ]);
 
             // Requests Admin API for a new JWT token.
-            var response = await _httpClient.PostAsync($"{_serverUrl}/realms/master/protocol/openid-connect/token", content);
+            var response = await _httpClient.PostAsync(
+                $"{_serverUrl}/realms/master/protocol/openid-connect/token",
+                content);
             response.EnsureSuccessStatusCode();
 
             using var stream = await response.Content.ReadAsStreamAsync();
@@ -50,12 +59,18 @@ namespace HardwareStore.Services.Tasks
             return json.RootElement.GetProperty("access_token").GetString()!;
         }
 
+        /// <summary>
+        /// Retrieves a list of roles assigned to a specific user in Keycloak.
+        /// </summary>
+        /// <param name="userId">The Keycloak user ID.</param>
+        /// <param name="token">The admin JWT token for authorization.</param>
+        /// <returns>A list of role names associated with the user.</returns>
         private async Task<List<string>> GetUserRolesAsync(string userId, string token)
         {
-            if (string.IsNullOrEmpty(userId))
+            if(string.IsNullOrEmpty(userId))
             {
                 Console.WriteLine("Cannot get roles - user ID is empty");
-                return new List<string>();
+                return [];
             }
 
             try
@@ -65,27 +80,30 @@ namespace HardwareStore.Services.Tasks
                 var response = await _httpClient.GetAsync(
                     $"{_serverUrl}/admin/realms/{_realm}/users/{userId}/role-mappings/realm");
 
-                if (response.IsSuccessStatusCode)
+                if(response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    var roles = JsonSerializer.Deserialize<List<KeycloakRole>>(content) ?? new List<KeycloakRole>();
+                    var roles = JsonSerializer.Deserialize<List<KeycloakRole>>(content) ?? [];
 
                     // Returns the role names
-                    return roles.Select(r => r.Name).ToList();
-                }
-                else
+                    return[ .. roles.Select(r => r.Name) ];
+                } else
                 {
                     Console.WriteLine($"Failed to get roles for user {userId}: {response.StatusCode}");
-                    return new List<string>();
+                    return [];
                 }
-            }
-            catch (Exception ex)
+            } catch(Exception ex)
             {
                 Console.WriteLine($"Error fetching roles for user {userId}: {ex.Message}");
-                return new List<string>();
+                return [];
             }
         }
 
+        /// <summary>
+        /// Synchronizes all users from the configured Keycloak realm into the local database. Adds new users, updates
+        /// existing ones, and ensures roles are correctly assigned.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task SyncUsersAsync()
         {
             try
@@ -96,14 +114,14 @@ namespace HardwareStore.Services.Tasks
 
                 // Call Keycloak Admin API
                 var response = await _httpClient.GetStringAsync($"{_serverUrl}/admin/realms/{_realm}/users");
-                var users = JsonSerializer.Deserialize<List<KeycloakUser>>(response) ?? new List<KeycloakUser>();
+                var users = JsonSerializer.Deserialize<List<KeycloakUser>>(response) ?? [];
 
                 Console.WriteLine($"Found {users.Count} users in Keycloak");
 
-                foreach (var kcUser in users)
+                foreach(var kcUser in users)
                 {
                     // Checks if the Id Field is null/empty
-                    if (string.IsNullOrEmpty(kcUser.Id))
+                    if(string.IsNullOrEmpty(kcUser.Id))
                     {
                         Console.WriteLine($"Skipping user {kcUser.Username} - Empty ID");
                         continue;
@@ -120,7 +138,7 @@ namespace HardwareStore.Services.Tasks
                     Console.WriteLine($"Primary role determined: {primaryRole}");
 
                     var user = await _context.AppUsers.FirstOrDefaultAsync(u => u.KeyCloakId == kcUser.Id);
-                    if (user == null)
+                    if(user == null)
                     {
                         Console.WriteLine($"Creating new user: {kcUser.Username}");
                         user = new ApplicationUser
@@ -135,8 +153,7 @@ namespace HardwareStore.Services.Tasks
                         };
 
                         _context.AppUsers.Add(user);
-                    }
-                    else
+                    } else
                     {
                         Console.WriteLine($"Updating existing user: {kcUser.Username}");
 
@@ -153,22 +170,29 @@ namespace HardwareStore.Services.Tasks
                 // Retrieves the changes to the database and writes it to the console.
                 var changes = await _context.SaveChangesAsync();
                 Console.WriteLine($"Saved {changes} changes to database");
-            }
-            catch (Exception ex)
+            } catch(Exception ex)
             {
                 Console.WriteLine($"Error in SyncUsersAsync: {ex.Message}");
-                if (ex.InnerException != null)
+                if(ex.InnerException != null)
                 {
                     Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
                 }
             }
         }
 
-        private string? DeterminePrimaryRole(List<string> roles)
+        /// <summary>
+        /// Determines the user's primary role based on the available Keycloak roles.
+        /// </summary>
+        /// <param name="roles">A list of roles assigned to the user.</param>
+        /// <returns>The determined primary role, or the first available role if no match is found.</returns>
+        private static string? DeterminePrimaryRole(List<string> roles)
         {
-            if (roles.Contains("admin")) return "Admin";
-            if (roles.Contains("manager")) return "Manager";
-            if (roles.Contains("staff")) return "Staff";
+            if(roles.Contains("admin"))
+                return "Admin";
+            if(roles.Contains("manager"))
+                return "Manager";
+            if(roles.Contains("staff"))
+                return "Staff";
 
             return roles.FirstOrDefault();
         }

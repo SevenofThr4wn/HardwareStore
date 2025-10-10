@@ -12,6 +12,10 @@ using System.Security.Claims;
 
 namespace HardwareStore.WebClient.Controllers
 {
+    /// <summary>
+    /// Controller responsible for managing orders including creation, cancellation, viewing,
+    /// and updating of order statuses. Integrates with notification and order services. 
+    /// </summary>
     public class OrdersController : Controller
     {
         private readonly AppDbContext _context;
@@ -19,6 +23,13 @@ namespace HardwareStore.WebClient.Controllers
         private readonly IOrderRepository _orderRepo;
         private readonly INotificationService _notificationService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrdersController"/> class.
+        /// </summary>
+        /// <param name="orderRepo">The repository used for data access operations related to orders.</param>
+        /// <param name="orderService">The service handling business logic related to orders.</param>
+        /// <param name="notificationService">The service responsible for sending notifications.</param>
+        /// <param name="context">The database context used for interacting with the SQL database.</param>
         public OrdersController(
             IOrderRepository orderRepo,
             IOrderService orderService,
@@ -31,6 +42,11 @@ namespace HardwareStore.WebClient.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Creates a new order, validates stock, deducts quantities, and sends notifications.
+        /// </summary>
+        /// <param name="model">The view model containing order and item details.</param>
+        /// <returns>A JSON response indicating success or failure.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateOrder(OrderCreateViewModel model)
@@ -105,8 +121,14 @@ namespace HardwareStore.WebClient.Controllers
             return Ok(new { success = true, message = "Order Sucessfully Created!", orderId = order.Id });
         }
 
-        // GET: CancelOrder
+
+        /// <summary>
+        /// Displays the confirmation view before an order is canceled.
+        /// </summary>
+        /// <param name="id">The ID of the order to cancel.</param>
+        /// <returns>The cancellation confirmation view.</returns>
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> CancelOrder(int id)
         {
             var order = await _orderService.GetOrderDetailsAsync(id, User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -116,7 +138,11 @@ namespace HardwareStore.WebClient.Controllers
             return View(order);
         }
 
-        // POST: CancelOrder
+        /// <summary>
+        /// Confirms and processes the cancellation of an existing order.
+        /// </summary>
+        /// <param name="id">The ID of the order to cancel.</param>
+        /// <returns>A redirect to the My Orders page upon success.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ActionName("CancelOrder")]
@@ -153,6 +179,11 @@ namespace HardwareStore.WebClient.Controllers
             }
         }
 
+        /// <summary>
+        /// Displays a list of orders for the currently logged-in user, optionally filtered by status.
+        /// </summary>
+        /// <param name="statusFilter">Optional order status to filter by.</param>
+        /// <returns>The My Orders view displaying user's orders.</returns>
         [Authorize]
         public async Task<IActionResult> MyOrders(OrderStatus? statusFilter = null)
         {
@@ -165,6 +196,11 @@ namespace HardwareStore.WebClient.Controllers
             return View(orders);
         }
 
+        /// <summary>
+        /// Displays detailed information for a specific order.
+        /// </summary>
+        /// <param name="id">The ID of the order.</param>
+        /// <returns>The order details view if found; otherwise a NotFound result.</returns>
         [Authorize]
         public async Task<IActionResult> OrderDetails(int id)
         {

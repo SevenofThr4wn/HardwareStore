@@ -25,10 +25,10 @@ namespace HardwareStore.WebClient.Controllers
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthController"/>.
+        /// Initializes a new instance of the <see cref="AuthController"/> class.
         /// </summary>
-        /// <param name="config">The application configuration containing Keycloak settings.</param>
-        /// <param name="httpClient">The HTTP client used to communicate with Keycloak endpoints.</param>
+        /// <param name="config">The configuration service providing Keycloak and application settings.</param>
+        /// <param name="httpClient">The HTTP client used for communicating with Keycloak APIs.</param>
         public AuthController(IConfiguration config, HttpClient httpClient)
         {
             _config = config;
