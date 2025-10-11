@@ -1,6 +1,4 @@
 ﻿using HardwareStore.Data.Context;
-using HardwareStore.Data.Helper;
-using HardwareStore.Data.Models;
 using HardwareStore.Data.Models.Interfaces;
 using HardwareStore.Data.Models.Repositories;
 using HardwareStore.Services.Helpers;
@@ -26,9 +24,6 @@ namespace HardwareStore.Extensions.Extensions
         public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration config)
         {
             services.AddScoped<INotificationService, NotificationService>();
-            services.Configure<KeycloakOptions>(
-                config.GetSection("Keycloak"));
-
             services.AddSignalR();
 
             return services;
@@ -65,8 +60,6 @@ namespace HardwareStore.Extensions.Extensions
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-            services.AddScoped<KeycloakHelper>();
 
             services.AddScoped<KeyCloakSync>(sp =>
             {
