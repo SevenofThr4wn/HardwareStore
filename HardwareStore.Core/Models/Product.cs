@@ -9,33 +9,38 @@ namespace HardwareStore.Core.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ProductId { get; set; }
 
-        [Required, Column("product_name"), StringLength(100)]
+        [Required]
+        [StringLength(100)]
+        [Column("ProductName")]
         public string Name { get; set; } = string.Empty;
 
-        [Required, Column("product_description"), StringLength(1000)]
+        [Required]
+        [StringLength(1000)]
+        [Column("ProductDescription")]
         public string Description { get; set; } = string.Empty;
 
         [Required]
-        [Column("product_price", TypeName = "decimal(18,2)")]
+        [Column("ProductPrice", TypeName = "decimal(18,2)")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
         public decimal Price { get; set; }
 
-        [Required, Column("stock_quantity"), Range(0, int.MaxValue)]
+        [Required]
+        [Range(0, int.MaxValue)]
         public int StockQuantity { get; set; }
 
-        [Required, Column("category"), StringLength(100)]
+        [Required]
+        [StringLength(100)]
         public string Category { get; set; } = string.Empty;
 
-        [Column("image_url"), StringLength(500)]
+        [StringLength(500)]
         public string? ImageUrl { get; set; }
 
-        [Required, Column("is_active")]
+        [Required]
         public bool IsActive { get; set; } = true;
 
         [Required]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-        [Column("date_updated")]
         public DateTime? Updated { get; set; }
 
         // Computed Properties
@@ -46,14 +51,5 @@ namespace HardwareStore.Core.Models
         [NotMapped]
         public bool IsLowStock => StockQuantity > 0 && StockQuantity <= 10;
 
-        // Methods
-        public void UpdateStock(int quantity)
-        {
-            if (StockQuantity + quantity < 0)
-                throw new InvalidOperationException("Insufficient stock");
-
-            StockQuantity += quantity;
-            Updated = DateTime.UtcNow;
-        }
     }
 }

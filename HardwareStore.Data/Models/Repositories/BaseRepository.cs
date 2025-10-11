@@ -52,7 +52,7 @@ namespace HardwareStore.Data.Models.Repositories
         /// <param name="entity">The entity to add.</param>
         public async Task AddAsync(T entity) =>
             await _dbSet.AddAsync(entity);
-        
+
         /// <summary>
         /// Updates an existing entity by ID using a provided update action.
         /// </summary>

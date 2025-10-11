@@ -99,7 +99,7 @@ namespace HardwareStore.WebClient.Controllers
                 var product = products.First(p => p.ProductId == item.ProductId);
                 product.StockQuantity -= item.Quantity;
 
-                if (product.StockQuantity <= 10) 
+                if (product.StockQuantity <= 10)
                 {
                     await _notificationService.NotifyLowStock(
                         product.ProductId,

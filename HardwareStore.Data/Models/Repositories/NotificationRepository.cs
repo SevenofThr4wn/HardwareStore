@@ -6,13 +6,12 @@ using Microsoft.EntityFrameworkCore;
 namespace HardwareStore.Data.Models.Repositories
 {
     /// <summary>
-    /// Initalizes a new instance of the <see cref="NotificationRepository"/> class.
+    /// Initializes a new instance of the <see cref="NotificationRepository"/> class.
     /// </summary>
     /// <param name="context">The database context to use.</param>
-    public class NotificationRepository(AppDbContext context) : BaseRepository<Notification>(context), INotificationRepository
+    public class NotificationRepository(AppDbContext context)
+        : BaseRepository<Notification>(context), INotificationRepository
     {
-        private readonly AppDbContext _context = context;
-
         /// <summary>
         /// Retrieves notifications for a specific user, ordered by most recent first.
         /// </summary>

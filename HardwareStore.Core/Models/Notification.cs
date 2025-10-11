@@ -3,24 +3,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HardwareStore.Core.Models
 {
+    [Table("Notifications")]
     public class Notification
     {
-        [Key, Column("notif_id")]
+        [Key]
+        [Column("NotificationId")]
         public int Id { get; set; }
 
-        [Column("user_id")]
+        [Column("UserId")]
         public string? UserId { get; set; }
-
-        [Column("title")]
         public string? Title { get; set; }
-
-        [Column("message")]
         public string Message { get; set; } = string.Empty;
-
-        [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        [Column("is_read")]
         public bool IsRead { get; set; } = false;
     }
 }

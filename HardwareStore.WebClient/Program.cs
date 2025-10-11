@@ -5,7 +5,8 @@ using HardwareStore.WebClient.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+                .AddRazorRuntimeCompilation();
 
 builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);

@@ -14,10 +14,11 @@ namespace HardwareStore.Data.Context
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
 
-        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Configures Relationships
 
             builder.Entity<OrderItem>()
                 .HasOne(oi => oi.Product)
@@ -33,6 +34,22 @@ namespace HardwareStore.Data.Context
                 .HasOne(o => o.User)
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.UserId);
+
+            // Configures Default Values
+
+            builder.Entity<ActivityLog>()
+                .Property(a => a.Timestamp)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+
+            // Creates Indexes
+
+            builder.Entity<ActivityLog>()
+                .HasIndex(a => new { a.Icon, a.Timestamp }, "IX_Icon_Timestamp");
+
+            builder.Entity<ApplicationUser>()
+                .HasIndex(u => u.KeyCloakId, "IX_KeycloakID")
+                .IsUnique();
         }
     }
 }

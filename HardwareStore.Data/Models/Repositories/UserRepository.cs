@@ -5,21 +5,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace HardwareStore.Data.Models.Repositories
-{
-    /// <summary>
-    /// Repository for managing <see cref="ApplicationUser"/> entities.
-    /// Provides basic CRUD operations through <see cref="BaseRepository{T}"/> and
-    /// additional methods for retrieving users by email or username, with caching support.
-    /// </summary>
-    /// <remarks>
-    /// Initializes a new instance of the <see cref="UserRepository"/> class.
-    /// </remarks>
-    /// <param name="context">The <see cref="AppDbContext"/> instance to use for database operations.</param>
-    /// <param name="memoryCache">The <see cref="IMemoryCache"/> instance to use for caching users.</param>
-    public class UserRepository(AppDbContext context, IMemoryCache memoryCache) : BaseRepository<ApplicationUser>(context), IUserRepository
+{ 
+    public class UserRepository : BaseRepository<ApplicationUser>, IUserRepository
     {
-        private readonly AppDbContext _context = context;
-        private readonly IMemoryCache _cache = memoryCache;
+        private readonly IMemoryCache _cache;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserRepository"/> class.
+        /// </summary>
+        /// <param name="context">The database context used to interact with the application's data.</param>
+        /// <param name="memoryCache">The memory cache used to store and retrieve cached data.</param>
+        public UserRepository(AppDbContext context, IMemoryCache memoryCache)
+            : base(context)
+        {
+            _cache = memoryCache;
+        }
 
         /// <summary>
         /// Retrieves a user by their email address asynchronously.

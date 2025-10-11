@@ -67,7 +67,7 @@ namespace HardwareStore.Services.Tasks
         /// <returns>A list of role names associated with the user.</returns>
         private async Task<List<string>> GetUserRolesAsync(string userId, string token)
         {
-            if(string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(userId))
             {
                 Console.WriteLine("Cannot get roles - user ID is empty");
                 return [];
@@ -80,19 +80,21 @@ namespace HardwareStore.Services.Tasks
                 var response = await _httpClient.GetAsync(
                     $"{_serverUrl}/admin/realms/{_realm}/users/{userId}/role-mappings/realm");
 
-                if(response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     var roles = JsonSerializer.Deserialize<List<KeycloakRole>>(content) ?? [];
 
                     // Returns the role names
-                    return[ .. roles.Select(r => r.Name) ];
-                } else
+                    return [.. roles.Select(r => r.Name)];
+                }
+                else
                 {
                     Console.WriteLine($"Failed to get roles for user {userId}: {response.StatusCode}");
                     return [];
                 }
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine($"Error fetching roles for user {userId}: {ex.Message}");
                 return [];
@@ -118,10 +120,10 @@ namespace HardwareStore.Services.Tasks
 
                 Console.WriteLine($"Found {users.Count} users in Keycloak");
 
-                foreach(var kcUser in users)
+                foreach (var kcUser in users)
                 {
                     // Checks if the Id Field is null/empty
-                    if(string.IsNullOrEmpty(kcUser.Id))
+                    if (string.IsNullOrEmpty(kcUser.Id))
                     {
                         Console.WriteLine($"Skipping user {kcUser.Username} - Empty ID");
                         continue;
@@ -138,7 +140,7 @@ namespace HardwareStore.Services.Tasks
                     Console.WriteLine($"Primary role determined: {primaryRole}");
 
                     var user = await _context.AppUsers.FirstOrDefaultAsync(u => u.KeyCloakId == kcUser.Id);
-                    if(user == null)
+                    if (user == null)
                     {
                         Console.WriteLine($"Creating new user: {kcUser.Username}");
                         user = new ApplicationUser
@@ -153,7 +155,8 @@ namespace HardwareStore.Services.Tasks
                         };
 
                         _context.AppUsers.Add(user);
-                    } else
+                    }
+                    else
                     {
                         Console.WriteLine($"Updating existing user: {kcUser.Username}");
 
@@ -170,10 +173,11 @@ namespace HardwareStore.Services.Tasks
                 // Retrieves the changes to the database and writes it to the console.
                 var changes = await _context.SaveChangesAsync();
                 Console.WriteLine($"Saved {changes} changes to database");
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine($"Error in SyncUsersAsync: {ex.Message}");
-                if(ex.InnerException != null)
+                if (ex.InnerException != null)
                 {
                     Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
                 }
@@ -187,11 +191,11 @@ namespace HardwareStore.Services.Tasks
         /// <returns>The determined primary role, or the first available role if no match is found.</returns>
         private static string? DeterminePrimaryRole(List<string> roles)
         {
-            if(roles.Contains("admin"))
+            if (roles.Contains("admin"))
                 return "Admin";
-            if(roles.Contains("manager"))
+            if (roles.Contains("manager"))
                 return "Manager";
-            if(roles.Contains("staff"))
+            if (roles.Contains("staff"))
                 return "Staff";
 
             return roles.FirstOrDefault();

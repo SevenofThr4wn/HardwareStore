@@ -4,43 +4,46 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HardwareStore.Core.Models
 {
+    [Table("Orders")]
     public class Order
     {
         [Key]
-        [Column("order_id")]
+        [Column("OrderId")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required, Column("user_id")]
+        [Required]
         public string UserId { get; set; } = string.Empty;
 
-        [Required, Column("order_number"), StringLength(50)]
+        [Required]
+        [StringLength(50)]
+        [Column("OrderNumber")]
         public string OrderNo { get; set; } = string.Empty;
 
-        [Required, Column("total_amount", TypeName = "decimal(18,2)")]
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
 
-        [Required, Column("order_status")]
+        [Required]
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
-        [Required, Column("order_date")]
+        [Required]
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
 
-        [Column("updated_date")]
         public DateTime? UpdatedDate { get; set; }
 
         // Shipping Information
 
-        [StringLength(100), Column("shipping_address")]
+        [StringLength(100)]
         public string? ShippingAddress { get; set; }
 
-        [StringLength(50), Column("shipping_city")]
+        [StringLength(50)]
         public string? ShippingCity { get; set; }
 
-        [StringLength(20), Column("shipping_postal_code")]
+        [StringLength(20)]
         public string? ShippingPostalCode { get; set; }
 
-        [StringLength(50), Column("shipping_country")]
+        [StringLength(50)]
         public string? ShippingCountry { get; set; }
 
         //Navigation properties
@@ -49,6 +52,7 @@ namespace HardwareStore.Core.Models
         public virtual List<OrderItem> OrderItems { get; set; } = new();
 
         // Computed properties
+
         [NotMapped]
         public string FormattedOrderNumber => $"#{OrderNo}";
 

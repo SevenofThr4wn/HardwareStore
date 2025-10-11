@@ -31,7 +31,7 @@ namespace HardwareStore.WebClient.Services.Extensions
                 Role = u.Role,
                 IsActive = u.IsActive,
                 LastLogin = u.LastLogin,
-                CreatedDate = u.DateCreated
+                CreatedDate = u.DateCreated ?? DateTime.MinValue
             });
         }
 

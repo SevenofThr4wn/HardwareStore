@@ -90,8 +90,52 @@
                     <a href="#" class="text-gray-700 hover:text-primary-600 font-medium">Support</a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button class="hidden md:block px-4 py-2 rounded-lg text-primary-600 font-medium hover:bg-primary-50 transition">Sign In</button>
-                    <button class="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium hover:shadow-lg transition">Cart</button>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <!-- Logout should be a form POST -->
+                        <form method="post" asp-controller="Auth" asp-action="Logout" class="hidden md:block">
+                            <button type="submit" class="px-4 py-2 rounded-lg text-primary-600 font-medium hover:bg-primary-50 transition">
+                                Log Out
+                            </button>
+                        </form>
+
+                        @* Admin dashboard link *@
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a class="hidden md:block px-4 py-2 rounded-lg text-primary-600 font-medium hover:bg-primary-50 transition"
+                               asp-controller="Dashboard" asp-action="AdminDashboard">
+                                Admin Dashboard
+                            </a>
+                        }
+
+                        @* Manager dashboard link *@
+                        @if (User.IsInRole("Manager"))
+                        {
+                            <a class="hidden md:block px-4 py-2 rounded-lg text-primary-600 font-medium hover:bg-primary-50 transition"
+                               asp-controller="Dashboard" asp-action="ManagerDashboard">
+                                Manager Dashboard
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <!-- Sign In -->
+                        <a class="hidden md:block px-4 py-2 rounded-lg text-primary-600 font-medium hover:bg-primary-50 transition"
+                           asp-controller="Auth" asp-action="Login">
+                            Sign In
+                        </a>
+
+                        <!-- Register -->
+                        <a class="hidden md:block px-4 py-2 rounded-lg text-primary-600 font-medium hover:bg-primary-50 transition"
+                           asp-controller="Auth" asp-action="Register">
+                            Register
+                        </a>
+                    }
+
+                    <a href="@Url.Action("Index", "Cart")"
+                       class="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium hover:shadow-lg transition">
+                        Cart
+                    </a>
                 </div>
             </div>
         </div>
@@ -291,5 +335,3 @@
     </script>
 </body>
 </html>
-
-
