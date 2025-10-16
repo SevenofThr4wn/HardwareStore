@@ -21,6 +21,7 @@ namespace HardwareStore.WebClient.Controllers
     public class AuthController : Controller
     {
         private readonly IConfiguration _config;
+        private readonly ILogger<AuthController> _logger;
         private readonly HttpClient _httpClient;
 
 
@@ -29,10 +30,11 @@ namespace HardwareStore.WebClient.Controllers
         /// </summary>
         /// <param name="config">The configuration service providing Keycloak and application settings.</param>
         /// <param name="httpClient">The HTTP client used for communicating with Keycloak APIs.</param>
-        public AuthController(IConfiguration config, HttpClient httpClient)
+        public AuthController(IConfiguration config, HttpClient httpClient, ILogger<AuthController> logger)
         {
             _config = config;
             _httpClient = httpClient;
+            _logger = logger;
         }
 
         /// <summary>
@@ -90,7 +92,7 @@ namespace HardwareStore.WebClient.Controllers
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
 
                 var userRoles = claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
-                Console.WriteLine($"User {model.Username} logged in with roles: {string.Join(", ", userRoles)}");
+                _logger.LogInformation($"User {model.Username} logged in with roles: {string.Join(", ", userRoles)}");
 
                 return LocalRedirect(returnUrl);
             }

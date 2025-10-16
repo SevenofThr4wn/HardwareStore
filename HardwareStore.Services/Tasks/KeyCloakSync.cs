@@ -2,6 +2,7 @@
 using HardwareStore.Data.Context;
 using HardwareStore.Data.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -22,6 +23,7 @@ namespace HardwareStore.Services.Tasks
     public class KeyCloakSync(
         AppDbContext context,
         HttpClient httpClient,
+        ILogger<KeyCloakSync> logger,
         string serverUrl,
         string realm,
         string adminUser,
@@ -33,6 +35,141 @@ namespace HardwareStore.Services.Tasks
         private readonly string _realm = realm;
         private readonly string _adminUser = adminUser;
         private readonly string _adminPassword = adminPassword;
+        private readonly ILogger<KeyCloakSync> _logger = logger;
+
+        /// <summary>
+        /// Synchronizes users from Keycloak to the local database, creating or updating records as necessary. If the Keycloak server is offline, it will retry a few times before aborting.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task SyncUsersAsync()
+        {
+            try
+            {
+                var maxRetries = 2;
+
+                for (int i = 0; i <= maxRetries; i++)
+                {
+                    if (await IsKeycloakOnlineAsync())
+                        break;
+
+                    if (i == maxRetries)
+                    {
+                        _logger.LogError("❌ Keycloak server still offline after retries. Aborting sync.");
+                        return;
+                    }
+
+                    _logger.LogWarning("⚠️ Keycloak offline, retrying in 10 seconds...");
+                    await Task.Delay(TimeSpan.FromSeconds(10));
+                }
+
+                // Retrieves a fresh JWT Token
+                var token = await GetAdminTokenAsync();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                // Call Keycloak Admin API
+                var response = await _httpClient.GetStringAsync($"{_serverUrl}/admin/realms/{_realm}/users");
+                var users = JsonSerializer.Deserialize<List<KeycloakUser>>(response) ?? [];
+
+                _logger.LogInformation($"Found {users.Count} users in Keycloak");
+
+                foreach (var kcUser in users)
+                {
+                    // Checks if the Id Field is null/empty
+                    if (string.IsNullOrEmpty(kcUser.Id))
+                    {
+                        _logger.LogWarning($"Skipping user {kcUser.Username} - Empty ID");
+                        continue;
+                    }
+                    _logger.LogInformation($"Processing user: {kcUser.Username} (ID: {kcUser.Id})");
+
+                    // Get user roles from Keycloak
+                    var userRoles = await GetUserRolesAsync(kcUser.Id, token);
+                    _logger.LogInformation($"User {kcUser.Username} has roles: {string.Join(", ", userRoles)}");
+
+                    // Determine the highest priority role or use a default
+                    var primaryRole = DeterminePrimaryRole(userRoles) ?? "Unknown";
+                    _logger.LogInformation($"Primary role determined: {primaryRole}");
+
+                    var user = await _context.AppUsers.FirstOrDefaultAsync(u => u.KeyCloakId == kcUser.Id);
+                    if (user == null)
+                    {
+                        _logger.LogInformation($"Creating new user: {kcUser.Username}");
+                        user = new ApplicationUser
+                        {
+                            KeyCloakId = kcUser.Id,
+                            UserName = kcUser.Username,
+                            FirstName = kcUser.FirstName,
+                            FullName = $"{kcUser.FirstName} {kcUser.LastName}".Trim(),
+                            LastName = kcUser.LastName,
+                            Email = kcUser.Email,
+                            IsActive = kcUser.Enabled,
+                            Role = primaryRole
+                        };
+
+                        _context.AppUsers.Add(user);
+                    }
+                    else
+                    {
+                        _logger.LogInformation($"Updating existing user: {kcUser.Username}");
+
+                        // Updates existing user
+                        user.UserName = kcUser.Username;
+                        user.FirstName = kcUser.FirstName;
+                        user.LastName = kcUser.LastName;
+                        user.Email = kcUser.Email;
+                        user.IsActive = kcUser.Enabled;
+                        user.Role = primaryRole;
+                    }
+                }
+
+                // Retrieves the changes to the database and writes it to the console.
+                var changes = await _context.SaveChangesAsync();
+                _logger.LogInformation($"Saved {changes} changes to database");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in SyncUsersAsync: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError($"Inner exception: {ex.InnerException.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines the user's primary role based on the available Keycloak roles.
+        /// </summary>
+        /// <param name="roles">A list of roles assigned to the user.</param>
+        /// <returns>The determined primary role, or the first available role if no match is found.</returns>
+        private static string DeterminePrimaryRole(List<string> roles)
+        {
+            if (roles == null || roles.Count == 0)
+                return "Staff";
+
+            if (roles.Any(r => r.Contains("Admin", StringComparison.OrdinalIgnoreCase))) return "Admin";
+            if (roles.Any(r => r.Contains("Manager", StringComparison.OrdinalIgnoreCase))) return "Manager";
+            if (roles.Any(r => r.Contains("Staff", StringComparison.OrdinalIgnoreCase))) return "Staff";
+
+            return roles.First();
+        }
+
+        /// <summary>
+        /// Checks whether the Keycloak server is reachable and online.
+        /// </summary>
+        /// <returns>True if the server responds sucessfully, false otherwise.</returns>
+        private async Task<bool> IsKeycloakOnlineAsync()
+        {
+            try
+            {
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                var response = await _httpClient.GetAsync($"{_serverUrl}/realms/{_realm}", cts.Token);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         /// <summary>
         /// Retrieves a Keycloak admin access token using the configured credentials.
@@ -69,7 +206,7 @@ namespace HardwareStore.Services.Tasks
         {
             if (string.IsNullOrEmpty(userId))
             {
-                Console.WriteLine("Cannot get roles - user ID is empty");
+                _logger.LogWarning("Cannot get roles - user ID is empty");
                 return new List<string>();
             }
 
@@ -89,7 +226,7 @@ namespace HardwareStore.Services.Tasks
                                                         !r.StartsWith("default-roles-", StringComparison.OrdinalIgnoreCase)));
                 }
 
-                
+
                 var clientId = "hardwarestore-client";
                 var clientResponse = await _httpClient.GetAsync(
                     $"{_serverUrl}/admin/realms/{_realm}/users/{userId}/role-mappings/clients/{clientId}");
@@ -102,110 +239,10 @@ namespace HardwareStore.Services.Tasks
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching roles for user {userId}: {ex.Message}");
+                _logger.LogError($"Error fetching roles for user {userId}: {ex.Message}");
             }
 
             return roles.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        }
-
-        /// <summary>
-        /// Synchronizes all users from the configured Keycloak realm into the local database. Adds new users, updates
-        /// existing ones, and ensures roles are correctly assigned.
-        /// </summary>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task SyncUsersAsync()
-        {
-            try
-            {
-                // Retrieves a fresh JWT Token
-                var token = await GetAdminTokenAsync();
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                // Call Keycloak Admin API
-                var response = await _httpClient.GetStringAsync($"{_serverUrl}/admin/realms/{_realm}/users");
-                var users = JsonSerializer.Deserialize<List<KeycloakUser>>(response) ?? [];
-
-                Console.WriteLine($"Found {users.Count} users in Keycloak");
-
-                foreach (var kcUser in users)
-                {
-                    // Checks if the Id Field is null/empty
-                    if (string.IsNullOrEmpty(kcUser.Id))
-                    {
-                        Console.WriteLine($"Skipping user {kcUser.Username} - Empty ID");
-                        continue;
-                    }
-                    Console.WriteLine($"Processing user: {kcUser.Username} (ID: {kcUser.Id})");
-
-                    // Get user roles from Keycloak
-                    var userRoles = await GetUserRolesAsync(kcUser.Id, token);
-                    Console.WriteLine($"User {kcUser.Username} has roles: {string.Join(", ", userRoles)}");
-
-                    // Determine the highest priority role or use a default
-                    var primaryRole = DeterminePrimaryRole(userRoles) ?? "Unknown";
-                    Console.WriteLine($"Primary role determined: {primaryRole}");
-
-                    var user = await _context.AppUsers.FirstOrDefaultAsync(u => u.KeyCloakId == kcUser.Id);
-                    if (user == null)
-                    {
-                        Console.WriteLine($"Creating new user: {kcUser.Username}");
-                        user = new ApplicationUser
-                        {
-                            KeyCloakId = kcUser.Id,
-                            UserName = kcUser.Username,
-                            FirstName = kcUser.FirstName,
-                            FullName = $"{kcUser.FirstName} {kcUser.LastName}".Trim(),
-                            LastName = kcUser.LastName,
-                            Email = kcUser.Email,
-                            IsActive = kcUser.Enabled,
-                            Role = primaryRole
-                        };
-
-                        _context.AppUsers.Add(user);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Updating existing user: {kcUser.Username}");
-
-                        // Updates existing user
-                        user.UserName = kcUser.Username;
-                        user.FirstName = kcUser.FirstName;
-                        user.LastName = kcUser.LastName;
-                        user.Email = kcUser.Email;
-                        user.IsActive = kcUser.Enabled;
-                        user.Role = primaryRole;
-                    }
-                }
-
-                // Retrieves the changes to the database and writes it to the console.
-                var changes = await _context.SaveChangesAsync();
-                Console.WriteLine($"Saved {changes} changes to database");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in SyncUsersAsync: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Determines the user's primary role based on the available Keycloak roles.
-        /// </summary>
-        /// <param name="roles">A list of roles assigned to the user.</param>
-        /// <returns>The determined primary role, or the first available role if no match is found.</returns>
-        private static string DeterminePrimaryRole(List<string> roles)
-        {
-            if (roles == null || roles.Count == 0)
-                return "Staff"; // fallback if user has no assigned role
-
-            if (roles.Any(r => r.Contains("Admin", StringComparison.OrdinalIgnoreCase))) return "Admin";
-            if (roles.Any(r => r.Contains("Manager", StringComparison.OrdinalIgnoreCase))) return "Manager";
-            if (roles.Any(r => r.Contains("Staff", StringComparison.OrdinalIgnoreCase))) return "Staff";
-
-            return roles.First();
         }
     }
 }

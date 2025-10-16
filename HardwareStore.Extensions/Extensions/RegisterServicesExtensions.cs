@@ -7,6 +7,7 @@ using HardwareStore.Services.Interfaces;
 using HardwareStore.Services.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace HardwareStore.Extensions.Extensions
 {
@@ -51,6 +52,7 @@ namespace HardwareStore.Extensions.Extensions
                 var clientId = keycloakSection["ClientId"]!;
                 var clientSecret = keycloakSection["ClientSecret"]!;
 
+
                 var keycloakClient = new Keycloak.Net.KeycloakClient(httpClient.ToString(), serverUrl);
 
                 return keycloakClient;
@@ -67,6 +69,8 @@ namespace HardwareStore.Extensions.Extensions
                 var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
                 var httpClient = httpClientFactory.CreateClient();
                 var configuration = sp.GetRequiredService<IConfiguration>();
+                var logger = sp.GetRequiredService<ILogger<KeyCloakSync>>();
+
 
                 var keycloakSection = configuration.GetSection("Keycloak");
                 var serverUrl = keycloakSection["ServerUrl"]!;
@@ -74,7 +78,8 @@ namespace HardwareStore.Extensions.Extensions
                 var adminUser = keycloakSection["AdminUser"]!;
                 var adminPassword = keycloakSection["AdminPassword"]!;
 
-                return new KeyCloakSync(dbContext, httpClient, serverUrl, realm, adminUser, adminPassword);
+
+                return new KeyCloakSync(dbContext, httpClient, logger, serverUrl, realm, adminUser, adminPassword);
             });
 
             services.AddHostedService<KeyCloakSyncService>();

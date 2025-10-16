@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace HardwareStore.Data.Models.Repositories
-{ 
+{
     public class UserRepository : BaseRepository<ApplicationUser>, IUserRepository
     {
         private readonly IMemoryCache _cache;

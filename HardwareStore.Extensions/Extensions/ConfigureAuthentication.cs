@@ -291,7 +291,6 @@ namespace HardwareStore.Extensions.Extensions
             }
         }
 
-
         /// <summary>
         /// A claims transformer that ensures authenticated users have their identity represented with the cookie
         /// authentication scheme.

@@ -7,7 +7,7 @@ namespace HardwareStore.Data.Models.Repositories
 {
     public class OrderRepository : BaseRepository<Order>, IOrderRepository
     {
-        public OrderRepository(AppDbContext context) : base(context) {}
+        public OrderRepository(AppDbContext context) : base(context) { }
 
         /// <summary>
         /// Marks an order as complete by updating its status to 'Shipped'.
