@@ -1,21 +1,44 @@
-﻿
-let theme = localStorage.getItem("Theme");
-if (theme === "Secondary") {
-    document.getElementById('themeStyle').setAttribute("href", "/css/secondary-theme.css")
+﻿window.addEventListener('load', () => {
+
+    applyTheme();
+
+    document.getElementById('btnTheme').addEventListener('click', () => switchTheme());
+});
+
+function applyTheme() {
+    let savedTheme = localStorage.getItem("Theme");
+
+    if (!savedTheme) {
+
+        let hour = new Date().GetHours();
+
+        if (hour >= 6 && hour < 18) {
+            savedTheme = "Primary";
+
+        } else {
+            savedTheme = "Secondary";
+        }
+
+        localStorage.setItem("Theme", savedTheme);
+    }
+
+    setTheme(savedTheme);
 }
-window.addEventListener('load', () => {
-    document.getElementById('btnTheme').addEventListener('click', () => switchTheme())
-})
 
 function switchTheme() {
     let currentTheme = localStorage.getItem("Theme");
+    let newTheme = currentTheme === "Secondary" ? "Primary" : "Secondary";
+    localStorage.setItem("Theme", newTheme);
+    setTheme(newTheme);
+}
 
-    if (currentTheme === "Secondary") {
-        localStorage.setItem("Theme", "Primary")
-        document.getElementById('themeStyle').setAttribute("href", "/css/primary-theme.css")
-    }
-    else {
-        localStorage.setItem("Theme", "Secondary")
-        document.getElementById('themeStyle').setAttribute("href", "/css/secondary-theme.css")
+function setTheme(theme) {
+    const themeLink = document.getElementById('themeStyle');
+    if (!themeLink) return;
+
+    if (theme === "Secondary") {
+        themeLink.setAttribute("href", "/css/secondary-theme.css");
+    } else {
+        themeLink.setAttribute("href", "/css/primary-theme.css");
     }
 }
