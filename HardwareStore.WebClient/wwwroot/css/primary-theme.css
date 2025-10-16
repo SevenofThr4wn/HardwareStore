@@ -2,11 +2,12 @@
     /* Base Theme Colors */
     --theme-color-1: #f0f9ff;
     --theme-footer-color: #111827;
-    
+    --theme-send-btn-color: #0369A1;
+
     /* Text Colors */
     --theme-text-1: #0285C7;
     --theme-text-2: #0369a1;
-
+    
     /* Gradient Set 1 */
     --theme-gradient-primary-1: #0EA5E9;
     --theme-gradient-secondary-1: #8B5CF6;
