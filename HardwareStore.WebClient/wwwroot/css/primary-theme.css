@@ -1,0 +1,29 @@
+﻿:root {
+    /* Base Theme Colors */
+    --theme-color-1: #f0f9ff;
+    --theme-footer-color: #111827;
+    
+    /* Text Colors */
+    --theme-text-1: #0285C7;
+    --theme-text-2: #0369a1;
+
+    /* Gradient Set 1 */
+    --theme-gradient-primary-1: #0EA5E9;
+    --theme-gradient-secondary-1: #8B5CF6;
+    
+    /* Gradient Set 2 */
+    --theme-gradient-primary-2: #38BDF8;
+    --theme-gradient-secondary-2: #8B5CF6;
+    
+    /* Gradient Set 3 */
+    --theme-gradient-primary-3: #06B6D4;
+    --theme-gradient-secondary-3: #3B82F6;
+    
+    /* Gradient Set 4 */
+    --theme-gradient-primary-4: #14B8A6;
+    --theme-gradient-secondary-4: #6366F1;
+    
+    /* Gradient Set 5 */
+    --theme-gradient-primary-5: #0EA5E9;
+    --theme-gradient-secondary-5: #7C3AED;
+}

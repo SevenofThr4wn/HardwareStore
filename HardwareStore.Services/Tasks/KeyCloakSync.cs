@@ -70,35 +70,42 @@ namespace HardwareStore.Services.Tasks
             if (string.IsNullOrEmpty(userId))
             {
                 Console.WriteLine("Cannot get roles - user ID is empty");
-                return [];
+                return new List<string>();
             }
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var roles = new List<string>();
 
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                var response = await _httpClient.GetAsync(
+                var realmResponse = await _httpClient.GetAsync(
                     $"{_serverUrl}/admin/realms/{_realm}/users/{userId}/role-mappings/realm");
-
-                if (response.IsSuccessStatusCode)
+                if (realmResponse.IsSuccessStatusCode)
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var roles = JsonSerializer.Deserialize<List<KeycloakRole>>(content) ?? [];
-
-                    // Returns the role names
-                    return [.. roles.Select(r => r.Name)];
+                    var content = await realmResponse.Content.ReadAsStringAsync();
+                    var realmRoles = JsonSerializer.Deserialize<List<KeycloakRole>>(content) ?? new List<KeycloakRole>();
+                    roles.AddRange(realmRoles.Select(r => r.Name)
+                                            .Where(r => !string.IsNullOrWhiteSpace(r) &&
+                                                        !r.StartsWith("default-roles-", StringComparison.OrdinalIgnoreCase)));
                 }
-                else
+
+                
+                var clientId = "hardwarestore-client";
+                var clientResponse = await _httpClient.GetAsync(
+                    $"{_serverUrl}/admin/realms/{_realm}/users/{userId}/role-mappings/clients/{clientId}");
+                if (clientResponse.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"Failed to get roles for user {userId}: {response.StatusCode}");
-                    return [];
+                    var content = await clientResponse.Content.ReadAsStringAsync();
+                    var clientRoles = JsonSerializer.Deserialize<List<KeycloakRole>>(content) ?? new List<KeycloakRole>();
+                    roles.AddRange(clientRoles.Select(r => r.Name).Where(r => !string.IsNullOrWhiteSpace(r)));
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error fetching roles for user {userId}: {ex.Message}");
-                return [];
             }
+
+            return roles.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         }
 
         /// <summary>
@@ -128,7 +135,6 @@ namespace HardwareStore.Services.Tasks
                         Console.WriteLine($"Skipping user {kcUser.Username} - Empty ID");
                         continue;
                     }
-                    // If the id is NOT empty, then write to console.
                     Console.WriteLine($"Processing user: {kcUser.Username} (ID: {kcUser.Id})");
 
                     // Get user roles from Keycloak
@@ -136,7 +142,7 @@ namespace HardwareStore.Services.Tasks
                     Console.WriteLine($"User {kcUser.Username} has roles: {string.Join(", ", userRoles)}");
 
                     // Determine the highest priority role or use a default
-                    var primaryRole = DeterminePrimaryRole(userRoles) ?? "Staff";
+                    var primaryRole = DeterminePrimaryRole(userRoles) ?? "Unknown";
                     Console.WriteLine($"Primary role determined: {primaryRole}");
 
                     var user = await _context.AppUsers.FirstOrDefaultAsync(u => u.KeyCloakId == kcUser.Id);
@@ -148,6 +154,7 @@ namespace HardwareStore.Services.Tasks
                             KeyCloakId = kcUser.Id,
                             UserName = kcUser.Username,
                             FirstName = kcUser.FirstName,
+                            FullName = $"{kcUser.FirstName} {kcUser.LastName}".Trim(),
                             LastName = kcUser.LastName,
                             Email = kcUser.Email,
                             IsActive = kcUser.Enabled,
@@ -189,16 +196,16 @@ namespace HardwareStore.Services.Tasks
         /// </summary>
         /// <param name="roles">A list of roles assigned to the user.</param>
         /// <returns>The determined primary role, or the first available role if no match is found.</returns>
-        private static string? DeterminePrimaryRole(List<string> roles)
+        private static string DeterminePrimaryRole(List<string> roles)
         {
-            if (roles.Contains("admin"))
-                return "Admin";
-            if (roles.Contains("manager"))
-                return "Manager";
-            if (roles.Contains("staff"))
-                return "Staff";
+            if (roles == null || roles.Count == 0)
+                return "Staff"; // fallback if user has no assigned role
 
-            return roles.FirstOrDefault();
+            if (roles.Any(r => r.Contains("Admin", StringComparison.OrdinalIgnoreCase))) return "Admin";
+            if (roles.Any(r => r.Contains("Manager", StringComparison.OrdinalIgnoreCase))) return "Manager";
+            if (roles.Any(r => r.Contains("Staff", StringComparison.OrdinalIgnoreCase))) return "Staff";
+
+            return roles.First();
         }
     }
 }

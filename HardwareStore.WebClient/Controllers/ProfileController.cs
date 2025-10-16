@@ -18,7 +18,6 @@ namespace HardwareStore.WebClient.Controllers
         [Authorize]
         public IActionResult Profile()
         {
-            // Displays the user profile using claims from JWT/cookie.
             var userProfile = new ProfileViewModel
             {
                 DisplayName = User.Identity!.Name!,

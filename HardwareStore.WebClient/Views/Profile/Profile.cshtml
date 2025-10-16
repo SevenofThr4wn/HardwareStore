@@ -11,7 +11,7 @@
             <!-- User Card -->
             <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 text-center mb-6 transform transition hover:-translate-y-1 hover:shadow-2xl">
                 <i class="bi bi-person-circle text-gray-400 text-6xl mb-4"></i>
-                <h5 class="text-xl font-semibold mb-1">@Model.DisplayName</h5>
+                <h5 class="text-xl font-semibold mb-1">@Model.FullName</h5>
                 <p class="text-gray-500 text-sm mb-4">@Model.Email</p>
 
                 @if (User.IsInRole("Admin"))
