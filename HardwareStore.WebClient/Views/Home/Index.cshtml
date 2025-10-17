@@ -303,8 +303,10 @@
             </div>
         </div>
     </footer>
-
+    <script src="~/lib/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="~/js/ui/alerts.js"></script>
     <script>
+
         VANTA.GLOBE({
             el: "#vanta-bg",
             mouseControls: true,
@@ -320,6 +322,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
+
+            showToast('Welcome to TechCore!', 'success');
             feather.replace();
             const cards = document.querySelectorAll('.card-hover');
             const observer = new IntersectionObserver((entries) => {

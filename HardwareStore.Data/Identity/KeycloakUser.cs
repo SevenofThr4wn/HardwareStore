@@ -27,7 +27,6 @@ namespace HardwareStore.Data.Identity
 
         [JsonPropertyName("createdTimestamp")]
         public long CreatedTimestamp { get; set; }
-
     }
 
     public class KeycloakRole
