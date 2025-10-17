@@ -24,7 +24,7 @@ namespace HardwareStore.Extensions.Extensions
         /// <returns>The IServiceCollection for chaining.</returns>
         public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration config)
         {
-            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IEmailService, EmailService>();
             services.AddSignalR();
 
             return services;
@@ -60,7 +60,6 @@ namespace HardwareStore.Extensions.Extensions
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
-            services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped<KeyCloakSync>(sp =>

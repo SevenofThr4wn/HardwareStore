@@ -2,7 +2,6 @@
 using HardwareStore.Core.Models;
 using HardwareStore.Data.Context;
 using HardwareStore.Data.Models.Interfaces;
-using HardwareStore.Services.Interfaces;
 using HardwareStore.WebClient.Services;
 using HardwareStore.WebClient.ViewModels.Orders.Create;
 using Microsoft.AspNetCore.Authorization;
@@ -21,7 +20,6 @@ namespace HardwareStore.WebClient.Controllers
         private readonly AppDbContext _context;
         private readonly IOrderService _orderService;
         private readonly IOrderRepository _orderRepo;
-        private readonly INotificationService _notificationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OrdersController"/> class.
@@ -33,12 +31,10 @@ namespace HardwareStore.WebClient.Controllers
         public OrdersController(
             IOrderRepository orderRepo,
             IOrderService orderService,
-            INotificationService notificationService,
             AppDbContext context)
         {
             _orderRepo = orderRepo;
             _orderService = orderService;
-            _notificationService = notificationService;
             _context = context;
         }
 
@@ -101,23 +97,11 @@ namespace HardwareStore.WebClient.Controllers
 
                 if (product.StockQuantity <= 10)
                 {
-                    await _notificationService.NotifyLowStock(
-                        product.ProductId,
-                        product.Name,
-                        product.StockQuantity
-                    );
+
                 }
             }
 
             await _context.SaveChangesAsync();
-
-            await _notificationService.NotifyNewOrder(
-                order.Id,
-                order.OrderNo,
-                userName,
-                order.TotalAmount
-            );
-
             return Ok(new { success = true, message = "Order Sucessfully Created!", orderId = order.Id });
         }
 
@@ -160,14 +144,6 @@ namespace HardwareStore.WebClient.Controllers
                 var oldStatus = order.Status.ToString();
 
                 await _orderService.CancelOrderAsync(id);
-
-                await _notificationService.NotifyOrderUpdateStatus(
-                    id,
-                    order.OrderNumber,
-                    oldStatus,
-                    "Cancelled",
-                    currentUser
-                );
 
                 return RedirectToAction(nameof(MyOrders));
             }
@@ -243,14 +219,6 @@ namespace HardwareStore.WebClient.Controllers
             var currentUser = User.Identity?.Name ?? "System";
 
             await _orderService.UpdateOrderStatusAsync(orderId, parsedStatus);
-
-            await _notificationService.NotifyOrderUpdateStatus(
-                orderId,
-                currentOrder.OrderNo,
-                oldStatus,
-                parsedStatus.ToString(),
-                currentUser
-            );
 
             return Ok(new { success = true, message = $"Order status updated to {parsedStatus}" });
         }

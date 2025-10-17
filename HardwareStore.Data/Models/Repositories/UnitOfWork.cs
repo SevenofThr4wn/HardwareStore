@@ -25,7 +25,6 @@ namespace HardwareStore.Data.Models.Repositories
             Users = new UserRepository(_context, _cache);
             Orders = new OrderRepository(_context);
             Products = new BaseRepository<Product>(_context);
-            Notifications = new BaseRepository<Notification>(_context);
         }
 
         /// <summary>
@@ -42,11 +41,6 @@ namespace HardwareStore.Data.Models.Repositories
         /// Repository for managing products. 
         /// </summary>
         public IBaseRepository<Product> Products { get; private set; }
-
-        /// <summary>
-        /// Repository for managing notifications. 
-        /// </summary>
-        public IBaseRepository<Notification> Notifications { get; private set; }
 
         /// <summary>
         /// Saves all changes made in the current unit of work to the database asynchronously.
