@@ -1,0 +1,38 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: "0 16 * * *"   # Runs every day at 16:00 UTC (adjust for your timezone)
+  workflow_dispatch:        # Allows manual runs from the Actions tab
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'  # Change to your .NET version
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test --no-build --verbosity normal
+
+      - name: Publish artifacts
+        run: dotnet publish -c Release -o ./publish
+        if: success()
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-build
+          path: ./publish
