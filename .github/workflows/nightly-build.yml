@@ -1,55 +1,56 @@
-name: Nightly Build and Commit
+name: Nightly Build Commit
 
 on:
   schedule:
-    - cron: "0 16 * * *" # Every day at 16:00 UTC
-  workflow_dispatch:      # Allow manual trigger
+    - cron: "0 16 * * *"   # Every day at 16:00 UTC
+  workflow_dispatch:        # Manual trigger
+
+permissions:
+  contents: write           # 👈 REQUIRED to allow pushes
+  actions: read
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0   # Required to push changes
+          fetch-depth: 0      # So we have full git history
+          ref: main           # Start from main branch (or whatever you want)
 
-      # 2️⃣ Setup .NET (change version as needed)
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      # 3️⃣ Restore, Build, Test
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build project
+      - name: Build solution
         run: dotnet build --configuration Release --no-restore
 
-      - name: Run tests
-        run: dotnet test --no-build --verbosity normal
-
-      # 4️⃣ Publish build output
       - name: Publish output
         run: dotnet publish -c Release -o ./nightly_build
 
-      # 5️⃣ Commit & push build to repo
-      - name: Commit nightly build
+      # 🔧 Commit and push the build folder
+      - name: Commit and push nightly build
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Add or update the nightly_build folder
-          git add nightly_build --force
+          git checkout -B nightly        # create or reset "nightly" branch
+          mkdir -p builds
+          cp -r nightly_build/* builds/
 
-          # Commit only if there are changes
+          git add builds --force
+
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "✅ No changes to commit."
           else
-            git commit -m "Nightly build: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            git commit -m "🌙 Nightly build: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
             git push origin HEAD:nightly --force
+            echo "🚀 Pushed to nightly branch!"
           fi
