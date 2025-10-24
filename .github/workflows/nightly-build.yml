@@ -1,38 +1,55 @@
-name: Nightly Build
+name: Nightly Build and Commit
 
 on:
   schedule:
-    - cron: "0 16 * * *"   # Runs every day at 16:00 UTC (adjust for your timezone)
-  workflow_dispatch:        # Allows manual runs from the Actions tab
+    - cron: "0 16 * * *" # Every day at 16:00 UTC
+  workflow_dispatch:      # Allow manual trigger
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0   # Required to push changes
 
+      # 2️⃣ Setup .NET (change version as needed)
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'  # Change to your .NET version
+          dotnet-version: '9.0.x'
 
+      # 3️⃣ Restore, Build, Test
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build
+      - name: Build project
         run: dotnet build --configuration Release --no-restore
 
       - name: Run tests
         run: dotnet test --no-build --verbosity normal
 
-      - name: Publish artifacts
-        run: dotnet publish -c Release -o ./publish
-        if: success()
+      # 4️⃣ Publish build output
+      - name: Publish output
+        run: dotnet publish -c Release -o ./nightly_build
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: nightly-build
-          path: ./publish
+      # 5️⃣ Commit & push build to repo
+      - name: Commit nightly build
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add or update the nightly_build folder
+          git add nightly_build --force
+
+          # Commit only if there are changes
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Nightly build: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            git push origin HEAD:nightly --force
+          fi
