@@ -7,14 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HardwareStore.WebClient</title>
 
-    <link rel="stylesheet" id="themeStyle" href="~/css/primary-theme.css" asp-append-version="true"/>
+    <!-- Core Styles -->
+    <link rel="stylesheet" id="themeStyle" href="~/css/primary-theme.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HardwareStore.WebClient.styles.css" asp-append-version="true" />
+
+    <!-- ✅ CDN Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -23,7 +26,7 @@
         @RenderBody()
     </main>
 
-    <!--Vendor Scripts-->
+    <!-- Vendor Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/sweetalert2/sweetalert2.all.min.js"></script>
@@ -31,12 +34,12 @@
     <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!--Core Scripts-->
+    <!-- Core Scripts -->
     <script src="~/js/core/site.js" asp-append-version="true"></script>
 
-    <!--UI Scripts-->
+    <!-- UI Scripts -->
     <script src="~/js/ui/alerts.js" asp-append-version="true"></script>
-    
-@await RenderSectionAsync("Scripts", required: false)
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

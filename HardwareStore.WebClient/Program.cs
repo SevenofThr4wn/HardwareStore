@@ -34,9 +34,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCookiePolicy();
-app.UseSecurityHeaders();
+//app.UseSecurityHeaders();
 
-app.UseSession();
+//app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
