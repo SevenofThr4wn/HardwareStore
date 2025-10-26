@@ -1,0 +1,56 @@
+name: Nightly Build Commit
+
+on:
+  schedule:
+    - cron: "0 16 * * *"   # Every day at 16:00 UTC
+  workflow_dispatch:        # Manual trigger
+
+permissions:
+  contents: write           # 👈 REQUIRED to allow pushes
+  actions: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0      # So we have full git history
+          ref: main           # Start from main branch (or whatever you want)
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish output
+        run: dotnet publish -c Release -o ./nightly_build
+
+      # 🔧 Commit and push the build folder
+      - name: Commit and push nightly build
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B nightly        # create or reset "nightly" branch
+          mkdir -p builds
+          cp -r nightly_build/* builds/
+
+          git add builds --force
+
+          if git diff --cached --quiet; then
+            echo "✅ No changes to commit."
+          else
+            git commit -m "🌙 Nightly build: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            git push origin HEAD:nightly --force
+            echo "🚀 Pushed to nightly branch!"
+          fi
