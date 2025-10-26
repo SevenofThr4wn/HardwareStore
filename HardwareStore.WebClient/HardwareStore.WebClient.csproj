@@ -7,13 +7,6 @@
     <UserSecretsId>d6711839-0b27-4223-9e29-cfe10dba80c5</UserSecretsId>
 	<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="ViewModels\Profile\**" />
-    <Content Remove="ViewModels\Profile\**" />
-    <EmbeddedResource Remove="ViewModels\Profile\**" />
-    <None Remove="ViewModels\Profile\**" />
-  </ItemGroup>
 	
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.10" />
@@ -34,4 +27,7 @@
 		<ProjectReference Include="..\HardwareStore.Services\HardwareStore.Services.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="wwwroot\images\" />
+	</ItemGroup>
 </Project>

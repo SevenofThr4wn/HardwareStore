@@ -1,29 +1,28 @@
 using HardwareStore.Extensions.Extensions;
+using HardwareStore.WebClient.Middleware;
 using HardwareStore.WebClient.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews()
-                .AddRazorRuntimeCompilation();
+    .AddRazorRuntimeCompilation();
 
-builder.Services.AddRepositories(builder.Configuration);
-builder.Services.AddServices(builder.Configuration);
+builder.Services
+    .AddRepositories(builder.Configuration)
+    .AddServices(builder.Configuration)
+    .AddScoped<IUserService, UserService>()
+    .AddScoped<IProductService, ProductService>()
+    .AddScoped<IOrderService, OrderService>();
 
-// Services
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-
-// Identity
 builder.Services.AddIdentityConfig();
-
-// Database 
 builder.Services.ConfigureSQLDatabase(builder.Configuration);
-
-// Authentication
 builder.Services.ConfigureKeycloakAuthentication(builder.Configuration);
-
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+});
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -33,17 +32,17 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseRouting();
-
+app.UseStaticFiles();
 app.UseCookiePolicy();
+app.UseSecurityHeaders();
+
+app.UseSession();
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

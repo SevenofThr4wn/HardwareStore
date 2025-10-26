@@ -13,6 +13,23 @@
     {
       "library": "sweetalert2@11.23.0",
       "destination": "wwwroot/lib/sweetalert2/"
+    },
+    {
+      "library": "vanta@0.5.24",
+      "destination": "wwwroot/lib/vanta/"
+    },
+    {
+      "library": "feather-icons@4.29.2",
+      "destination": "wwwroot/lib/feather-icons/"
+    },
+    {
+      "library": "tailwindcss@4.1.13",
+      "destination": "wwwroot/lib/tailwindcss/"
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "bootstrap-icons@1.11.3",
+      "destination": "wwwroot/lib/bootstrap-icons/"
     }
   ]
 }
